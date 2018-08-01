@@ -28,4 +28,9 @@ class CfgWeapons {
         displayName = "AGM-114N Hellfire II";
         magazines[] = {"6Rnd_ACE_Hellfire_AGM114N", "PylonMissile_1Rnd_ACE_Hellfire_AGM114N", "PylonRack_1Rnd_ACE_Hellfire_AGM114N", "PylonRack_3Rnd_ACE_Hellfire_AGM114N", "PylonRack_4Rnd_ACE_Hellfire_AGM114N"};
     };
+    class GVAR(launcher_L): GVAR(launcher) {
+        EGVAR(laser,canSelect) = 0;
+        displayName = "AGM-114L Hellfire Longbow";
+        magazines[] = {"6Rnd_ACE_Hellfire_AGM114L", "PylonMissile_1Rnd_ACE_Hellfire_AGM114L", "PylonRack_1Rnd_ACE_Hellfire_AGM114L", "PylonRack_3Rnd_ACE_Hellfire_AGM114L", "PylonRack_4Rnd_ACE_Hellfire_AGM114L"};
+    };
 };

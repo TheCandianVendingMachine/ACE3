@@ -16,3 +16,10 @@ class EGVAR(missileguidance,AttackProfiles) {
         GVAR(launchHeightClear) = 91.5; // clear 300 ft by 600m
     };
 };
+class EGVAR(missileguidance,SeekerTypes) {
+    class GVAR(ARH) {
+        functionName = QFUNC(activeRadarHoming);
+    };
+};
+
+

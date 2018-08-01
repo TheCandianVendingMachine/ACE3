@@ -65,4 +65,16 @@ class CfgAmmo {
             enabled = 1; // Missile Guidance must be explicitly enabled
         };
     };
+    class ACE_Hellfire_AGM114L: ACE_Hellfire_AGM114K {
+        displayName = "AGM-114L";
+        displayNameShort = "AGM-114L";
+        description = "AGM-114L";
+        descriptionShort = "AGM-114L";
+        class ace_missileguidance: ace_missileguidance {
+            enabled = 1; // Missile Guidance must be explicitly enabled
+            onFired = QFUNC(onLongbowFired);
+            defaultSeekerType = QGVAR(ARH);
+            seekerTypes[] = { QGVAR(ARH), "GPS" };
+        };
+    };
 };

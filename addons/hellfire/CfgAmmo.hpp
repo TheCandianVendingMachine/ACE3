@@ -71,10 +71,13 @@ class CfgAmmo {
         description = "AGM-114L";
         descriptionShort = "AGM-114L";
         class ace_missileguidance: ace_missileguidance {
+            canVanillaLock = 1;
             enabled = 1; // Missile Guidance must be explicitly enabled
             onFired = QFUNC(onLongbowFired);
             defaultSeekerType = QGVAR(ARH);
             seekerTypes[] = { QGVAR(ARH), "GPS" };
+            defaultSeekerLockMode = "LOBL";
+            seekerLockModes[] = { "LOAL", "LOBL" };
         };
     };
 };

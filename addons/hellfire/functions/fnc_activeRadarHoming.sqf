@@ -16,11 +16,11 @@
  * Public: No
  */
 params ["", "_args", "_seekerStateParams"];
-_args params ["_firedEH"];
+_args params ["_firedEH", "", "", "_seekerParams"];
 _firedEH params ["","","","","","","_projectile"];
 
-_seekerStateParams params["_seekerData", "_launchType", "_targetPos", ["_targetObject", objNull], ["_lastKnownTargetVelocity", [0, 0, 0]], ["_lastKnownTargetPos", [0, 0, 0]], ["_etaWhenLost", 0], ["_radarLockedObject", objNull]];
-_seekerData params["_seekerFOV", "_seekerRange", "_seekerBaseRadius"];
+_seekerStateParams params["_launchType", "_targetPos", ["_targetObject", objNull], ["_lastKnownTargetVelocity", [0, 0, 0]], ["_lastKnownTargetPos", [0, 0, 0]], ["_etaWhenLost", 0], ["_radarLockedObject", objNull]];
+_seekerParams params ["_seekerAngle", "", "_seekerMaxRange"];
 
 private _projPos = getPosASL _projectile;
 private _projDir = vectorDir _projectile;
@@ -31,8 +31,8 @@ private _rotatedYaw = (+(_projDir select 0) * sin _projYaw) + (+(_projDir select
 if (_rotatedYaw isEqualTo 0) then { _rotatedYaw = 0.001 };
 private _projPitch = atan ((_projDir select 2) / _rotatedYaw);
 private _a1 = abs _projPitch;
-private _a2 = 180 - ((_seekerFOV / 2) + _a1);
-private _seekerBaseRadiusAtGround = _distanceToTarget / sin(_a2) * sin(_seekerFOV / 2);
+private _a2 = 180 - ((_seekerAngle / 2) + _a1);
+private _seekerBaseRadiusAtGround = _distanceToTarget / sin(_a2) * sin(_seekerAngle / 2);
 
 // Active homing enabled when close to target
 if (_distanceToTarget <= 2000) then {
@@ -43,8 +43,7 @@ if (_distanceToTarget <= 2000) then {
         private _targetAdjustedPos = _radarLockedObject modelToWorldWorld _centerOfObject;
         _targetPos = _targetAdjustedPos;
         
-        private _intersectingObjects = lineIntersectsObjs [_projPos, _targetPos, objNull, _radarLockedObject, false, 16];
-        if (count _intersectingObjects > 0) then {
+        if !([_projPos, _targetPos] call ace_missileguidance_fnc_checkLOS) then {
             // There is something between the missile and target, assume last known moving position. Lost lock on radar with this
             _targetPos = _lastKnownTargetPos vectorAdd (_lastKnownTargetVelocity vectorMultiply _etaWhenLost);
             //_radarLockedObject = objNull;
@@ -56,30 +55,10 @@ if (_distanceToTarget <= 2000) then {
             private _projSpeed = vectorMagnitude velocity _projectile;
             private _eta = _distanceToTarget / _projSpeed;
             _seekerStateParams set[6, _eta];
-            
-            // determine if target is within FOV of missile
-            private _coneDist = (_targetAdjustedPos vectorDiff _projPos) vectorDotProduct (_projDir);
-            private _inCone = false;
-            
-            if (_coneDist > 0 && _coneDist <= _seekerRange) then {
-                private _coneRadius = (_coneDist / _seekerRange) * _seekerBaseRadiusAtGround;
-                private _orthDist = vectorMagnitude ((_targetAdjustedPos vectorDiff _projPos) vectorDiff (_projDir vectorMultiply _coneDist));
-                
-                if (_orthDist < _seekerBaseRadiusAtGround) then { _inCone = true; }
-            };
-            
-            if (!_inCone) then {
-                // target is not within FOV
-                _targetPos = [0, 0, 0];
-            };
-            
-            systemChat str(_inCone);
         };
         
-        private _isFacingDot = _projDir vectorDotProduct vectorNormalized(_projPos vectorDiff _targetPos);
-
-        if (_isFacingDot >= 0) then {
-            // hellfire moved past the target
+        if !([_projPos, _targetPos, _seekerAngle] call ace_missileguidance_fnc_checkSeekerAngle) then {
+            // target is not within FOV
             _targetPos = [0, 0, 0];
         };
     } else {
@@ -93,8 +72,7 @@ if (_distanceToTarget <= 2000) then {
             } else {
                 // couldnt find the "marked" target
                 _radarLockedObject = {
-                    private _intersectingObjects = lineIntersectsObjs [_projPos, getPosASL _x, objNull, _radarLockedObject, false, 16];
-                    if (count _intersectingObjects == 0) exitWith {
+                    if !([_projPos, getPosASL _x] call ace_missileguidance_fnc_checkLOS) exitWith {
                         _x
                     };
                     objNull

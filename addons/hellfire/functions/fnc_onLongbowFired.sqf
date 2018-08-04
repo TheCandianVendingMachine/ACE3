@@ -14,7 +14,7 @@
  *
  * Public: No
  */
-params ["_firedEH", "_launchParams", "", "", "_stateParams"];
+params ["_firedEH", "_launchParams", "", "_seekerParams", "_stateParams"];
 _firedEH params ["_shooter","","","","","","_projectile"];
 _launchParams params ["","_targetLaunchParams"];
 _targetLaunchParams params ["_target", "_targetPos", "_launchPos"];
@@ -29,7 +29,7 @@ private _potentialTargetVel = velocity _closestObject;
 // set launch pos to the warhead pos
 _targetLaunchParams set [2, getPosASL _projectile];
 
-_seekerStateParams set[2, _potentialTargetPos];
+_seekerStateParams set[0, _potentialTargetPos];
 
 if (!isVehicleRadarOn vehicle _shooter) then {
     _seekerStateParams set[1, "GPS"];
@@ -42,13 +42,8 @@ if (!isVehicleRadarOn vehicle _shooter) then {
     // Aproximation of the position the unit will be at when the missile becomes active.
     private _aproxETA = (1 * _distanceToTarget) / (_missileAccel * _missileAccelTime);
     
-    _seekerStateParams set[1, "RADAR"];
-    _seekerStateParams set[2, _potentialTargetPos vectorAdd (_potentialTargetVel vectorMultiply _aproxETA)];
-    _seekerStateParams set[3, _closestObject]; // storing the "radar signature" of the wanted target
+    _seekerStateParams set[0, "RADAR"];
+    _seekerStateParams set[1, _potentialTargetPos vectorAdd (_potentialTargetVel vectorMultiply _aproxETA)];
+    _seekerStateParams set[2, _closestObject]; // storing the "radar signature" of the wanted target
 };
-
-private _seekerFOV = 5;
-private _seekerRange = 8000;
-private _seekerBaseRadius = _seekerRange * sin(_seekerFOV / 2);
-_seekerStateParams set[0, [_seekerFOV, _seekerRange, _seekerBaseRadius]];
 

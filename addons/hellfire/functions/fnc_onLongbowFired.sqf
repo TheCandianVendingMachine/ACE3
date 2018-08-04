@@ -14,7 +14,7 @@
  *
  * Public: No
  */
-params ["_firedEH", "_launchParams", "", "_seekerParams", "_stateParams"];
+params ["_firedEH", "_launchParams", "", "", "_stateParams"];
 _firedEH params ["_shooter","","","","","","_projectile"];
 _launchParams params ["","_targetLaunchParams"];
 _targetLaunchParams params ["_target", "_targetPos", "_launchPos"];
@@ -29,7 +29,7 @@ private _potentialTargetVel = velocity _closestObject;
 // set launch pos to the warhead pos
 _targetLaunchParams set [2, getPosASL _projectile];
 
-_seekerStateParams set[0, _potentialTargetPos];
+_seekerStateParams set[1, _potentialTargetPos];
 
 if (!isVehicleRadarOn vehicle _shooter) then {
     _seekerStateParams set[1, "GPS"];

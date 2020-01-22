@@ -139,6 +139,19 @@ class CfgAmmo {
 
             defaultSeekerLockMode = "LIN";
             seekerLockModes[] = {"LIN"};
+            
+            // TV Guided projectiles have extra data that is irrelevant to most missiles
+            class camera {
+                enabled = 1;
+                switchOnFire = 1;
+                
+                fovLevels[] = { 1.2, 0.6, 0.2, 0.05 };
+                initialFOV = 0.6;
+                
+                enabledThermalTypes[] = { "normal", "nvg", "white_hot_black_cold", "black_hot_white_cold", "light_green_hot_dark_green_cold", "black_hot_green_cold", "light_red_hot_dark_red_cold", "black_hot_red_cold", "white_hot_red_cold", "predator" };
+                initialThermalType = "normal";
+                
+            };
 
             seekerAngle = 90;           // Angle in front of the missile which can be searched
             seekerAccuracy = 1;         // seeker accuracy multiplier

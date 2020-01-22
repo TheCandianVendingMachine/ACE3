@@ -74,6 +74,24 @@ switch (_key) do {
         _shooter setVariable [QGVAR(MCLOSInputs), _inputs];
         _return = true;
     }; //Down
+    case 7: {
+        if(_down) then {
+            [] call FUNC(camera_cycleViewMode);
+        };
+        _return = true;
+    }; //N
+    case 8: {
+        if(_down) then {
+            [true] call FUNC(camera_changeZoom);
+        };
+        _return = true;
+    }; // Num+
+    case 9: {
+        if(_down) then {
+            [false] call FUNC(camera_changeZoom);
+        };
+        _return = true;
+    }; // Num-
 
 };
 _return;

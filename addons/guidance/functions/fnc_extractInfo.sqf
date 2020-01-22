@@ -364,4 +364,18 @@ private _miscManeuvering = [_degreesPerSecond, _glideAngle, diag_tickTime, time,
 private _miscSensor = [_sensorAngle, _sensorMinRange, _sensorMaxRange];
 private _miscFuze = [_fuzeVehicle, _fuzeAlt, _fuzeRange, _fuzeTime, _fuzeLoc];
 
-[_seekerType, _attackProfile, _target, _targetPos, _targetVector, _launchPos, _launchTime, _miscManeuvering, _miscSensor, _miscSeeker, _miscProfile, _miscFuze];
+// Setup camera array
+private _cameraConfig = _config >> "camera";
+private _cameraArray = [false];
+if (!(_cameraConfig isEqualTo configNull) && { (getNumber (_cameraConfig >> "enabled")) == 1 }) then {
+    _cameraArray set [0, true];
+    _cameraArray set [1, getArray (_cameraConfig >> "fovLevels")];
+    _cameraArray set [2, getNumber (_cameraConfig >> "initialFOV")];
+    
+    _cameraArray set [3, getArray (_cameraConfig >> "enabledThermalTypes")];
+    _cameraArray set [4, getText (_cameraConfig >> "initialThermalType")];
+    
+    _cameraArray set [5, getNumber (_cameraConfig >> "switchOnFire")];
+};
+
+[_seekerType, _attackProfile, _target, _targetPos, _targetVector, _launchPos, _launchTime, _miscManeuvering, _miscSensor, _miscSeeker, _miscProfile, _miscFuze, _cameraArray];

@@ -33,9 +33,20 @@ if(isNull _projectile) exitWith {[0,0,0]};
 
 private _projPos = getposASL _projectile;
 if (_hasCamera) then {
-    if (_designating && { !(_pointPos isEqualTo [0, 0, 0]) }) then {
-        _focusPoint = _pointPos;
-        _miscSeeker set [1, _focusPoint];
+    if (_designating) then {
+        private _hasTargetPos = false;
+        if !(_pointPos isEqualTo [0, 0, 0]) then {
+            _focusPoint = _pointPos;
+            _hasTargetPos = true;
+        } else {
+            if !(_groundPos isEqualTo [0, 0, 0]) then {
+                _focusPoint = _groundPos;
+                _hasTargetPos = true;
+            }
+        };
+        if (_hasTargetPos) then {
+            _miscSeeker set [1, _focusPoint];
+        };
     };
 } else {
     if (isNil "_focusPoint" || (count _focusPoint) <= 0 ) exitWith {

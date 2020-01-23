@@ -18,7 +18,7 @@
 
 params ["_extractedInfo"];
 _extractedInfo params ["", "", "", "", "", "", "", "_miscManeuvering", "", "", "", "", "_cameraArray"];
-_cameraArray params ["", "", "", "", "", "", "", "", "_viewData", "_gimbalData"];
+_cameraArray params ["", "", "", "", "", "", "", "", "_viewData", "_gimbalData", "_designating"];
 _viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCamera"];
 _gimbalData params ["_hasGimbal", "_maxGimbalX", "_maxGimbalY", "_gimbalSpeedX", "_gimbalSpeedY"];
 
@@ -32,6 +32,13 @@ private _logic = GVAR(activeCamera) getVariable [QGVAR(logic), objNull];
 
 private _fovChanged = GVAR(activeCamera) getVariable [QGVAR(fovChanged), false];
 private _cameraPos = getPosASL _projectile;
+
+private _designatedLastFrame = GVAR(activeCamera) getVariable [QGVAR(designatedLastFrame), false];
+
+if (!_designating && _designatedLastFrame) then {
+    _designatedLastFrame = false;
+    GVAR(activeCamera) setVariable [QGVAR(designatedLastFrame), _designatedLastFrame];
+};
 
 if (_fovChanged) then {
     private _lerpFovEnabled = GVAR(activeCamera) getVariable [QGVAR(lerpFOVChange), false];
@@ -59,7 +66,6 @@ if (_fovChanged) then {
     GVAR(activeCamera) setVariable [QGVAR(currentFOV), _setFOV];
 };
 
-private _lastGroundPos = GVAR(activeCamera) getVariable [QGVAR(lastMovedGroundPos), [0, 0, 0]];
 private _relativePos = GVAR(activeCamera) getVariable [QGVAR(logicPos), _relativePos];
 if (_hasGimbal) then {
     _miscManeuvering params ["", "", "", "", "_deltaTime"];
@@ -69,15 +75,48 @@ if (_hasGimbal) then {
        
     if ((_lookInput find 1) < 0) then {
         _movingCamera = false;
+        private _lastGroundPos = GVAR(activeCamera) getVariable [QGVAR(lastMovedGroundPos), [0, 0, 0]];
+        
+        // If we designate a target set the current tracking point to the current ground point to avoid unwanted behavior from static cameras
+        if (_designating && !_designatedLastFrame) then {
+            _designatedLastFrame = true;
+            GVAR(activeCamera) setVariable [QGVAR(designatedLastFrame), _designatedLastFrame];
+            _lastGroundPos = _groundPos;
+            GVAR(activeCamera) setVariable [QGVAR(lastMovedGroundPos), _lastGroundPos];
+        };
+
         // lock the camera and dont gimbal with missile rotation
         if !(_lastGroundPos isEqualTo [0, 0, 0]) then {
             drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 1, 1, 1], ASLtoAGL (_lastGroundPos), 0.75, 0.75, 0, "Last Camera Ground Position", 1, 0.025, "TahomaB"];
-            _camera camSetTarget _lastGroundPos;
+
+            private _relativeGround = _projectile worldToModelVisual ASLtoAGL _lastGroundPos;
+            private _distToGround = vectorMagnitude _relativeGround;
+            private _relativePosDiff = (vectorNormalized _relativePos) vectorMultiply _distToGround;
+            
+            private _dx = (_relativeGround#0) - (_relativePosDiff#0); // difference between looking position on ground and last ground position
+            private _dy = (_relativeGround#2) - (_relativePosDiff#2);
+
+            private _distToRp0 = sqrt ((_relativePos#1)^2 + (_relativePos#0)^2);
+            private _distToRp2 = sqrt ((_relativePos#1)^2 + (_relativePos#2)^2);
+
+            private _drp0 = (_distToRp0 * _dx) / _distToGround;
+            private _drp2 = (_distToRp2 * _dy) / _distToGround;
+            
+            private _expectedPos = [_relativePos#0 + _drp0, _relativePos#1, _relativePos#2 + _drp2];
+            
+            private _angleX = atan ((_expectedPos#0) / (_expectedPos#1));
+            private _angleY = atan ((_expectedPos#2) / (_expectedPos#1));
+            
+            if (_maxGimbalX - (abs _angleX) > 0) then {
+                _relativePos set [0, _expectedPos#0];
+            };
+            if (_maxGimbalY - (abs _angleY) > 0) then {
+                _relativePos set [2, _expectedPos#2];
+            };
         };
-        
     } else {
         _movingCamera = true;
-    
+
         private _angleX = atan ((_relativePos#0) / (_relativePos#1));
         private _angleY = atan ((_relativePos#2) / (_relativePos#1));
         
@@ -111,12 +150,10 @@ _logic setVectorUp [0, 0, 1];
 _logic setDir getDir _projectile;
 _logic setPosASL (_projectile modelToWorldVisualWorld _relativePos);
 
-if (_movingCamera || _lastGroundPos isEqualTo [0, 0, 0]) then {
-    _camera camSetTarget _logic;
-};
-_camera camSetPos getPos _projectile;
+_camera camSetTarget _logic;
+_camera camSetPos ASLtoATL _cameraPos;
 
-_lookDir = vectorNormalized (getPosASL _logic vectorDiff getPosASL _camera);
+_lookDir = _cameraPos vectorFromTo (getPosASL _logic);
 
 private _projectedPos = _cameraPos vectorAdd (_lookDir vectorMultiply 10000);
 

@@ -134,8 +134,8 @@ class CfgAmmo {
         class ADDON {
             enabled = 1;
             
-            defaultSeekerType = "MCLOS";
-            seekerTypes[] = {"MCLOS"};
+            defaultSeekerType = "EO";
+            seekerTypes[] = {"EO"};
 
             defaultSeekerLockMode = "LIN";
             seekerLockModes[] = {"LIN"};
@@ -143,13 +143,21 @@ class CfgAmmo {
             // TV Guided projectiles have extra data that is irrelevant to most missiles
             class camera {
                 enabled = 1;
-                switchOnFire = 1;
+                switchOnFire = 1; // switch to the camera view immediately upon firing
                 
-                fovLevels[] = { 1.2, 0.6, 0.2, 0.05 };
-                initialFOV = 0.6;
+                gimbal = 1;
+                gimbalAngleX = 45; // how far left/right can this look in degrees
+                gimbalAngleY = 45; // how far up/down can this look in degrees
+                gimbalSpeedX = 5;  // how many fast we can look left and right
+                gimbalSpeedY = 5;  // how many fast we can look up and down
                 
-                enabledThermalTypes[] = { "normal", "nvg", "white_hot_black_cold", "black_hot_white_cold", "light_green_hot_dark_green_cold", "black_hot_green_cold", "light_red_hot_dark_red_cold", "black_hot_red_cold", "white_hot_red_cold", "predator" };
-                initialThermalType = "normal";
+                fovLevels[] = { 0.2 }; // levels of zoom this has
+                initialFOV = 0.2;
+                lerpFOV = 0;
+                fovChangeTime = 1;
+                
+                enabledThermalTypes[] = { "white_hot_black_cold", "black_hot_white_cold" };
+                initialThermalType = "white_hot_black_cold";
                 
             };
 

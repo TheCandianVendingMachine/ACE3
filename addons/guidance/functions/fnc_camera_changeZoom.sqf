@@ -22,7 +22,6 @@ private _zoomArray = GVAR(activeCamera) getVariable [QGVAR(fovLevels), []];
 private _camera = GVAR(activeCamera) getVariable [QGVAR(camera), objNull];
 
 if ((count _zoomArray) == 0) exitWith {};
-systemChat "test";
 if (_increase) then {
     if ((_zoomIndex + 1) < count _zoomArray) then {
         _zoomIndex = _zoomIndex + 1;
@@ -34,5 +33,7 @@ if (_increase) then {
 };
 
 GVAR(activeCamera) setVariable [QGVAR(currentZoomIndex), _zoomIndex];
-_camera camSetFOV (_zoomArray select _zoomIndex);
-
+GVAR(activeCamera) setVariable [QGVAR(targetFOV), _zoomArray select _zoomIndex];
+GVAR(activeCamera) setVariable [QGVAR(fovChanged), true];
+GVAR(activeCamera) setVariable [QGVAR(fovChangedTime), CBA_missionTime];
+GVAR(activeCamera) setVariable [QGVAR(startingFov), GVAR(activeCamera) getVariable QGVAR(currentFOV)];

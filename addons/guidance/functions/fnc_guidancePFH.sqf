@@ -22,7 +22,7 @@ params ["_args", "_pfID"];
 _args params ["_firedEH","_extractedInfo"];
 
 _firedEH params ["_shooter","_weapon","_muzzle","_mode","_ammo","_magazine","_projectile"];
-_extractedInfo params ["_seekerType", "_attackProfile", "_target", "_targetPos", "_targetVector", "_launchPos", "_launchTime", "_miscManeuvering", "_miscSensor", "_miscSeeker", "_miscProfile", "_miscFuze", "_cameraArray"];
+_extractedInfo params ["_seekerType", "_attackProfile", "_target", "_targetPos", "_targetVector", "_launchPos", "_launchTime", "_miscManeuvering", "_miscSensor", "_miscSeeker", "_miscProfile", "_miscFuze", "_miscCamera"];
 _miscManeuvering params ["_degreesPerSecond", "_glideAngle", "_lastTickTime", "_lastRunTime", "_runtimeDelta"];
 _miscSensor params ["_seekerAngle", "_seekerMinRange", "_seekerMaxRange"];
 
@@ -59,6 +59,8 @@ _miscManeuvering set [4, _runtimeDelta];
 
 private _projPos = getposASL _projectile;
 
+[_extractedInfo] call FUNC(camera_update);
+
 // Seeker Search
 private _seekerTargetPos = [_projectile, _shooter, _extractedInfo] call FUNC(runSeekerSearch);
 if (isNil "_seekerTargetPos") then {
@@ -70,8 +72,6 @@ private _attackProfileTargetPos = [_projectile, _shooter, _extractedInfo, _seeke
 if (isNil "_attackProfileTargetPos") then {
     _attackProfileTargetPos = [0,0,0];
 };
-
-[_seekerTargetPos, _attackProfileTargetPos] call FUNC(camera_update);
 
 drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1,0,0,1], ASLtoAGL _projPos, 0.75, 0.75, 0, _ammo, 1, 0.025, "TahomaB"];
 

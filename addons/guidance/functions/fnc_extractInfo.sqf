@@ -375,7 +375,14 @@ if (!(_cameraConfig isEqualTo configNull) && { (getNumber (_cameraConfig >> "ena
     _cameraArray set [3, getArray (_cameraConfig >> "enabledThermalTypes")];
     _cameraArray set [4, getText (_cameraConfig >> "initialThermalType")];
     
-    _cameraArray set [5, getNumber (_cameraConfig >> "switchOnFire")];
+    _cameraArray set [5, (getNumber (_cameraConfig >> "switchOnFire")) == 1];
+    
+    _cameraArray set [6, getNumber (_cameraConfig >> "lerpFOV")];
+    _cameraArray set [7, getNumber (_cameraConfig >> "fovChangeTime")];
+    
+    _cameraArray set [8, [[0, 0, 0], [0, 0, 0]]]; // camera view data. [look direction, ground pos]
+    
+    _cameraArray set [9, [(getNumber (_cameraConfig >> "gimbal")) == 1, getNumber (_cameraConfig >> "gimbalAngleX"), getNumber (_cameraConfig >> "gimbalAngleY"), getNumber (_cameraConfig >> "gimbalSpeedX"), getNumber (_cameraConfig >> "gimbalSpeedY")]];
 };
 
 [_seekerType, _attackProfile, _target, _targetPos, _targetVector, _launchPos, _launchTime, _miscManeuvering, _miscSensor, _miscSeeker, _miscProfile, _miscFuze, _cameraArray];

@@ -16,7 +16,7 @@
  * Public: No
  */
 params ["_projectile", "_cameraArray"];
-_cameraArray params ["_enabled", "_fovLevels", "_initialFOV", "_thermalTypes", "_initialThermalType", "_switchOnFire"];
+_cameraArray params ["_enabled", "_fovLevels", "_initialFOV", "_thermalTypes", "_initialThermalType", "_switchOnFire", "_lerpFOV", "_fovChangeTime"];
  
 if !(_enabled) exitWith {};
  
@@ -47,14 +47,26 @@ GVAR(activeCameraNamespace) setVariable [QGVAR(missile), _projectile];
 GVAR(activeCameraNamespace) setVariable [QGVAR(fovLevels), _fovLevels];
 GVAR(activeCameraNamespace) setVariable [QGVAR(thermalTypes), _thermalTypes];
 
-GVAR(activeCameraNamespace) setVariable [QGVAR(currentZoomIndex), 0];
-GVAR(activeCameraNamespace) setVariable [QGVAR(currentTIModeIndex), 0];
+GVAR(activeCameraNamespace) setVariable [QGVAR(lerpFOVChange), _lerpFOV == 1];
+GVAR(activeCameraNamespace) setVariable [QGVAR(targetFOV), _initialFOV];
+GVAR(activeCameraNamespace) setVariable [QGVAR(currentFOV), _initialFOV];
+GVAR(activeCameraNamespace) setVariable [QGVAR(fovChanged), false];
+GVAR(activeCameraNamespace) setVariable [QGVAR(fovChangeTime), _fovChangeTime];
+
+private _currentZoomIndex = _fovLevels findIf { _x isEqualTo _initialFOV };
+if (_currentZoomIndex < 0) then { _currentZoomIndex = 0 };
+
+private _currentTIIndex = _thermalTypes findIf { _x isEqualTo _initialThermalType };
+if (_currentTIIndex < 0) then { _currentTIIndex = 0 };
+
+GVAR(activeCameraNamespace) setVariable [QGVAR(currentZoomIndex), _currentZoomIndex];
+GVAR(activeCameraNamespace) setVariable [QGVAR(currentTIModeIndex), _currentTIIndex];
 
 GVAR(activeCamera) = GVAR(activeCameraNamespace);
 
 [_initialThermalType] call FUNC(camera_setViewMode);
 
 
-if (_switchOnFire == 1) then {
+if (_switchOnFire) then {
     [] call FUNC(camera_switchTo);
 };

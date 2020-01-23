@@ -17,10 +17,12 @@
  */
 
 params ["_projectile", "_shooter","_extractedInfo"];
-_extractedInfo params ["_seekerType", "_attackProfile", "_target", "_targetPos", "_targetVector", "_launchPos", "_launchTime", "_miscManeuvering", "_miscSensor", "_miscSeeker", "_miscProfile"];
+_extractedInfo params ["_seekerType", "_attackProfile", "_target", "_targetPos", "_targetVector", "_launchPos", "_launchTime", "_miscManeuvering", "_miscSensor", "_miscSeeker", "_miscProfile", "_miscFuze", "_miscCamera"];
 _miscManeuvering params ["_degreesPerSecond", "_glideAngle", "_lastTickTime", "_lastRunTime"];
 _miscSensor params ["_seekerAngle", "_seekerMinRange", "_seekerMaxRange"];
 _miscSeeker params ["_active", "_focusPoint", "_points"];
+_miscCamera params ["_hasCamera", "", "", "", "", "", "", "", "_viewData"];
+_viewData params ["_lookDir", "_groundPos"];
 
 if(!_active) exitWith {[0,0,0]};
 
@@ -30,6 +32,9 @@ _seekerMaxRange = 5000;
 if(isNull _projectile) exitWith {[0,0,0]};
 
 private _projPos = getposASL _projectile;
+if (_hasCamera) then {
+    //_focusPoint = _groundPos;
+};
 
 if(isNil "_focusPoint" || (count _focusPoint) <= 0 ) exitWith {
     _focusPoint = terrainIntersectAtASL [_projPos, _projPos vectorAdd (_finalVector vectorMultiply 10000)];

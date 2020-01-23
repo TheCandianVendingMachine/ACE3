@@ -52,6 +52,9 @@ GVAR(activeCameraNamespace) setVariable [QGVAR(targetFOV), _initialFOV];
 GVAR(activeCameraNamespace) setVariable [QGVAR(currentFOV), _initialFOV];
 GVAR(activeCameraNamespace) setVariable [QGVAR(fovChanged), false];
 GVAR(activeCameraNamespace) setVariable [QGVAR(fovChangeTime), _fovChangeTime];
+GVAR(activeCameraNamespace) setVariable [QGVAR(logicPos), [0, 50, 0]];
+
+GVAR(activeCameraNamespace) setVariable [QGVAR(lastMovedGroundPos), [0, 0, 0]];
 
 private _currentZoomIndex = _fovLevels findIf { _x isEqualTo _initialFOV };
 if (_currentZoomIndex < 0) then { _currentZoomIndex = 0 };

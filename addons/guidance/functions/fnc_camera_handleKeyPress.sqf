@@ -19,7 +19,17 @@ params ["_key", "_down"];
 
 private _return = false;
 private _lookInput = GVAR(activeCamera) getVariable [QGVAR(lookInput), [0, 0, 0, 0]];
+private _designateInput = GVAR(activeCamera) getVariable [QGVAR(designateInput), [0]];
 switch (_key) do {
+    case 1: {
+        // designate whatever. depends on seeker to implement
+        if (_down) then {
+            _designateInput set [0, 1];
+        } else {
+            _designateInput set [0, 0];
+        };
+        _return = true;
+    }; //MF key 1
     case 3: {
         if (_down) then {
             _lookInput set [0, 1];
@@ -74,6 +84,7 @@ switch (_key) do {
         _return = true;
     }; // Num-
 };
+GVAR(activeCamera) setVariable [QGVAR(designateInput), _designateInput];
 GVAR(activeCamera) setVariable [QGVAR(lookInput), _lookInput];
 
 _return

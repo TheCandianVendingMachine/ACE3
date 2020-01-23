@@ -21,8 +21,8 @@ _extractedInfo params ["_seekerType", "_attackProfile", "_target", "_targetPos",
 _miscManeuvering params ["_degreesPerSecond", "_glideAngle", "_lastTickTime", "_lastRunTime"];
 _miscSensor params ["_seekerAngle", "_seekerMinRange", "_seekerMaxRange"];
 _miscSeeker params ["_active", "_focusPoint", "_points"];
-_miscCamera params ["_hasCamera", "", "", "", "", "", "", "", "_viewData"];
-_viewData params ["_lookDir", "_groundPos"];
+_miscCamera params ["_hasCamera", "", "", "", "", "", "", "", "_viewData", "", "_designating"];
+_viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCamera"];
 
 if(!_active) exitWith {[0,0,0]};
 
@@ -33,15 +33,18 @@ if(isNull _projectile) exitWith {[0,0,0]};
 
 private _projPos = getposASL _projectile;
 if (_hasCamera) then {
-    //_focusPoint = _groundPos;
-};
-
-if(isNil "_focusPoint" || (count _focusPoint) <= 0 ) exitWith {
-    _focusPoint = terrainIntersectAtASL [_projPos, _projPos vectorAdd (_finalVector vectorMultiply 10000)];
-    if((count _focusPoint) < 1) then {
-        _focusPoint = _projPos vectorAdd (_finalVector vectorMultiply 10000)
+    if (_designating && { !(_pointPos isEqualTo [0, 0, 0]) }) then {
+        _focusPoint = _pointPos;
+        _miscSeeker set [1, _focusPoint];
     };
-    _miscSeeker set [1, _focusPoint];
+} else {
+    if (isNil "_focusPoint" || (count _focusPoint) <= 0 ) exitWith {
+        _focusPoint = terrainIntersectAtASL [_projPos, _projPos vectorAdd (_finalVector vectorMultiply 10000)];
+        if((count _focusPoint) < 1) then {
+            _focusPoint = _projPos vectorAdd (_finalVector vectorMultiply 10000)
+        };
+        _miscSeeker set [1, _focusPoint];
+    };
 };
 
 private _toVector = _projPos vectorFromTo _focusPoint;

@@ -43,3 +43,4 @@ PREP(camera_destroy);
 PREP(camera_cycleViewMode);
 PREP(camera_setViewMode);
 PREP(camera_changeZoom);
+PREP(camera_handleKeyPress);

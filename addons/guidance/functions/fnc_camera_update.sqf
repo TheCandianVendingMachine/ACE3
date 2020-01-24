@@ -15,38 +15,41 @@
  *
  * Public: No
  */
-
-params ["_extractedInfo"];
+params ["_extractedInfo", "_projectile"];
 _extractedInfo params ["", "", "", "", "", "", "", "_miscManeuvering", "", "", "", "", "_cameraArray"];
-_cameraArray params ["", "", "", "", "", "", "", "", "_viewData", "_gimbalData", "_designating"];
+_cameraArray params ["", "", "", "", "", "", "", "", "_viewData", "_gimbalData", "_designating", "_designateWhenStationary"];
 _viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCamera"];
-_gimbalData params ["_hasGimbal", "_maxGimbalX", "_maxGimbalY", "_gimbalSpeedX", "_gimbalSpeedY"];
+_gimbalData params ["_hasGimbal", "_maxGimbalX", "_maxGimbalY", "_gimbalSpeedX", "_gimbalSpeedY", "", "", "_gimbalZoomSpeedModifiers"];
 
-cameraEffectEnableHUD true;
+private _cameraNamespace = [_projectile] call FUNC(camera_getCameraNamespaceFromProjectile);
+if (_cameraNamespace isEqualTo objNull) exitWith {};
 
-_cameraArray set [10, (GVAR(activeCamera) getVariable [QGVAR(designateInput), [0]])#0 == 1];
- 
-private _camera = GVAR(activeCamera) getVariable [QGVAR(camera), nil];
-private _projectile = GVAR(activeCamera) getVariable [QGVAR(missile), objNull];
-private _logic = GVAR(activeCamera) getVariable [QGVAR(logic), objNull];
+if ([_cameraNamespace] call FUNC(camera_userInCamera)) then {
+    cameraEffectEnableHUD true;
+};
 
-private _fovChanged = GVAR(activeCamera) getVariable [QGVAR(fovChanged), false];
-private _cameraPos = getPosASL _projectile;
+private _camera = _cameraNamespace getVariable [QGVAR(camera), nil];
+private _logic = _cameraNamespace getVariable [QGVAR(logic), objNull];
 
-private _designatedLastFrame = GVAR(activeCamera) getVariable [QGVAR(designatedLastFrame), false];
+private _fovChanged = _cameraNamespace getVariable [QGVAR(fovChanged), false];
+private _missilePos = getPosASL _projectile;
+private _missileRelativeOffset = [0, (_cameraNamespace getVariable [QGVAR(projectileSize), 0]), 0];
+private _cameraPosASL = (_projectile modelToWorldVisualWorld _missileRelativeOffset);
+
+private _designatedLastFrame = _cameraNamespace getVariable [QGVAR(designatedLastFrame), false];
 
 if (!_designating && _designatedLastFrame) then {
     _designatedLastFrame = false;
-    GVAR(activeCamera) setVariable [QGVAR(designatedLastFrame), _designatedLastFrame];
+    _cameraNamespace setVariable [QGVAR(designatedLastFrame), _designatedLastFrame];
 };
 
 if (_fovChanged) then {
-    private _lerpFovEnabled = GVAR(activeCamera) getVariable [QGVAR(lerpFOVChange), false];
-    private _targetFOV = GVAR(activeCamera) getVariable [QGVAR(targetFOV), 1];
-    private _currentFOV = GVAR(activeCamera) getVariable [QGVAR(currentFOV), 1];
-    private _fovChangeStart = GVAR(activeCamera) getVariable [QGVAR(fovChangedTime), 0];
-    private _startingFOV = GVAR(activeCamera) getVariable [QGVAR(startingFov), 1];
-    private _fovChangeTime = GVAR(activeCamera) getVariable [QGVAR(fovChangeTime), 0];
+    private _lerpFovEnabled = _cameraNamespace getVariable [QGVAR(lerpFOVChange), false];
+    private _targetFOV = _cameraNamespace getVariable [QGVAR(targetFOV), 1];
+    private _currentFOV = _cameraNamespace getVariable [QGVAR(currentFOV), 1];
+    private _fovChangeStart = _cameraNamespace getVariable [QGVAR(fovChangedTime), 0];
+    private _startingFOV = _cameraNamespace getVariable [QGVAR(startingFov), 1];
+    private _fovChangeTime = _cameraNamespace getVariable [QGVAR(fovChangeTime), 0];
     
     private _setFOV = _targetFOV;
     if (_lerpFovEnabled) then {
@@ -62,47 +65,48 @@ if (_fovChanged) then {
     };
     
     _camera camSetFOV _setFOV;
-    GVAR(activeCamera) setVariable [QGVAR(fovChanged), _fovChanged];
-    GVAR(activeCamera) setVariable [QGVAR(currentFOV), _setFOV];
+    _cameraNamespace setVariable [QGVAR(fovChanged), _fovChanged];
+    _cameraNamespace setVariable [QGVAR(currentFOV), _setFOV];
 };
 
-private _relativePos = GVAR(activeCamera) getVariable [QGVAR(logicPos), _relativePos];
+private _relativePos = _cameraNamespace getVariable [QGVAR(logicPos), [0, 10, 0] vectorAdd _missileRelativeOffset];
 if (_hasGimbal) then {
     _miscManeuvering params ["", "", "", "", "_deltaTime"];
 
-    private _lookInput = GVAR(activeCamera) getVariable [QGVAR(lookInput), [0, 0, 0, 0]];
+    private _lookInput = _cameraNamespace getVariable [QGVAR(lookInput), [0, 0, 0, 0]];
     _lookInput params ["_up", "_down", "_left", "_right"];
        
     if ((_lookInput find 1) < 0) then {
         _movingCamera = false;
-        private _lastGroundPos = GVAR(activeCamera) getVariable [QGVAR(lastMovedGroundPos), [0, 0, 0]];
+        private _lastGroundPos = _cameraNamespace getVariable [QGVAR(lastMovedGroundPos), [0, 0, 0]];
         
         // If we designate a target set the current tracking point to the current ground point to avoid unwanted behavior from static cameras
         if (_designating && !_designatedLastFrame) then {
             _designatedLastFrame = true;
-            GVAR(activeCamera) setVariable [QGVAR(designatedLastFrame), _designatedLastFrame];
+            _cameraNamespace setVariable [QGVAR(designatedLastFrame), _designatedLastFrame];
             _lastGroundPos = _groundPos;
-            GVAR(activeCamera) setVariable [QGVAR(lastMovedGroundPos), _lastGroundPos];
+            _cameraNamespace setVariable [QGVAR(lastMovedGroundPos), _lastGroundPos];
         };
 
         // lock the camera and dont gimbal with missile rotation
         if !(_lastGroundPos isEqualTo [0, 0, 0]) then {
-            drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 1, 1, 1], ASLtoAGL (_lastGroundPos), 0.75, 0.75, 0, "Last Camera Ground Position", 1, 0.025, "TahomaB"];
+            drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 1, 1, 1], ASLtoATL (_lastGroundPos), 0.75, 0.75, 0, "Last Camera Ground Position", 1, 0.025, "TahomaB"];
+            private _relativePosOffset = _relativePos vectorDiff _missileRelativeOffset;
 
-            private _relativeGround = _projectile worldToModelVisual ASLtoAGL _lastGroundPos;
+            private _relativeGround = AGLtoASL (_projectile worldToModelVisual ASLtoAGL _lastGroundPos);
             private _distToGround = vectorMagnitude _relativeGround;
-            private _relativePosDiff = (vectorNormalized _relativePos) vectorMultiply _distToGround;
+            private _relativePosDiff = (vectorNormalized _relativePosOffset) vectorMultiply _distToGround;
             
             private _dx = (_relativeGround#0) - (_relativePosDiff#0); // difference between looking position on ground and last ground position
             private _dy = (_relativeGround#2) - (_relativePosDiff#2);
 
-            private _distToRp0 = sqrt ((_relativePos#1)^2 + (_relativePos#0)^2);
-            private _distToRp2 = sqrt ((_relativePos#1)^2 + (_relativePos#2)^2);
+            private _distToRp0 = sqrt ((_relativePosOffset#1)^2 + (_relativePosOffset#0)^2);
+            private _distToRp2 = sqrt ((_relativePosOffset#1)^2 + (_relativePosOffset#2)^2);
 
             private _drp0 = (_distToRp0 * _dx) / _distToGround;
             private _drp2 = (_distToRp2 * _dy) / _distToGround;
-            
-            private _expectedPos = [_relativePos#0 + _drp0, _relativePos#1, _relativePos#2 + _drp2];
+
+            private _expectedPos = [_relativePosOffset#0 + _drp0, _relativePosOffset#1, _relativePosOffset#2 + _drp2];
             
             private _angleX = atan ((_expectedPos#0) / (_expectedPos#1));
             private _angleY = atan ((_expectedPos#2) / (_expectedPos#1));
@@ -117,58 +121,59 @@ if (_hasGimbal) then {
     } else {
         _movingCamera = true;
 
+        _gimbalZoomSpeedModifiers = [1, 0.7];
+        private _speedModifier = 1;
+        if !(_gimbalZoomSpeedModifiers isEqualTo []) then {
+            _speedModifier = (_gimbalZoomSpeedModifiers select (_cameraNamespace getVariable [QGVAR(currentZoomIndex), 0]));
+        };
+
+        private _posX = (_speedModifier * _gimbalSpeedX * _deltaTime * (_right - _left));
+        private _posY = (_speedModifier * _gimbalSpeedY * _deltaTime * (_up - _down));
+               
         private _angleX = atan ((_relativePos#0) / (_relativePos#1));
         private _angleY = atan ((_relativePos#2) / (_relativePos#1));
-        
-        if (_maxGimbalX - (abs _angleX) <= 0) then {
-            if (_angleX > 0) then {
-                _right = 0;
-            } else {
-                _left = 0;
-            };
+        if (_maxGimbalX - (abs _angleX) > 0) then {
+            _relativePos set [0, _relativePos#0 + _posX];
         };
-        
-        if (_maxGimbalY - (abs _angleY) <= 0) then { 
-            if (_angleY > 0) then {
-                _up = 0;
-            } else {
-                _down = 0;
-            };
+        if (_maxGimbalY - (abs _angleY) > 0) then {
+            _relativePos set [2, _relativePos#2 + _posY];
         };
-        
-        private _posX = _relativePos#0 + ((_gimbalSpeedX * _deltaTime) * (_right - _left));
-        private _posY = _relativePos#2 + ((_gimbalSpeedY * _deltaTime) * (_up - _down));
-            
-        _relativePos set [0, _posX];
-        _relativePos set [2, _posY];
     };
 };
 
-GVAR(activeCamera) setVariable [QGVAR(logicPos), _relativePos];
+_designating = _cameraNamespace getVariable [QGVAR(alwaysDesignate), false] || { (_cameraNamespace getVariable [QGVAR(designateInput), [0]])#0 == 1 };
+if (_designateWhenStationary && !_movingCamera) then {
+    _designating = true;
+};
+_cameraArray set [10, _designating];
+_cameraNamespace setVariable [QGVAR(logicPos), _relativePos];
 
 _logic setVectorUp [0, 0, 1];
 _logic setDir getDir _projectile;
 _logic setPosASL (_projectile modelToWorldVisualWorld _relativePos);
 
 _camera camSetTarget _logic;
-_camera camSetPos ASLtoATL _cameraPos;
+_camera setPos (_projectile modelToWorldVisual _missileRelativeOffset);
 
-_lookDir = _cameraPos vectorFromTo (getPosASL _logic);
+_lookDir = _cameraPosASL vectorFromTo (getPosASL _logic);
 
-private _projectedPos = _cameraPos vectorAdd (_lookDir vectorMultiply 10000);
+private _projectedPos = _cameraPosASL vectorAdd (_lookDir vectorMultiply 10000);
 
-private _surfaceIntersections = lineIntersectsSurfaces [_cameraPos, _projectedPos, _projectile, _logic];
+private _surfaceIntersections = lineIntersectsSurfaces [_cameraPosASL, _projectedPos, _projectile, _logic];
 
 private _pointPos = [0, 0, 0];
-private _groundPos = terrainIntersectAtASL [_cameraPos, _projectedPos];
+private _groundPos = terrainIntersectAtASL [_cameraPosASL, _projectedPos];
 
 if (count _surfaceIntersections > 0) then {
     _pointPos = (_surfaceIntersections select 0) select 0;
 };
 
 if (_movingCamera) then {
-    GVAR(activeCamera) setVariable [QGVAR(lastMovedGroundPos), _groundPos];
+    _cameraNamespace setVariable [QGVAR(lastMovedGroundPos), _groundPos];
 };
+
+drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 0.5, 1, 1], _projectile modelToWorldVisual _missileRelativeOffset, 0.75, 0.75, 0, "Camera Pos", 1, 0.025, "TahomaB"];
+drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 0.5, 1, 1], getPosATL _logic, 0.75, 0.75, 0, "Logic Pos", 1, 0.025, "TahomaB"];
 
 drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [0, 1, 1, 1], ASLtoAGL (_groundPos), 0.75, 0.75, 0, "Camera Ground Position", 1, 0.025, "TahomaB"];
 drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 1, 0, 1], ASLtoAGL (_pointPos), 0.75, 0.75, 0, "Camera Point Position", 1, 0.025, "TahomaB"];

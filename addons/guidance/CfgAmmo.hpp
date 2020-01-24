@@ -146,15 +146,23 @@ class CfgAmmo {
                 switchOnFire = 1; // switch to the camera view immediately upon firing
                 
                 gimbal = 1;
+                
                 gimbalAngleX = 45; // how far left/right can this look in degrees
                 gimbalAngleY = 45; // how far up/down can this look in degrees
-                gimbalSpeedX = 5;  // how many fast we can look left and right
-                gimbalSpeedY = 5;  // how many fast we can look up and down
+                gimbalSpeedX = 10;  // how many fast we can look left and right
+                gimbalSpeedY = 10;  // how many fast we can look up and down
                 
-                fovLevels[] = { 0.2 }; // levels of zoom this has
+                gimbalInitOffsetX = 0;
+                gimbalInitOffsetY = -20;
+                
+                fovLevels[] = { 0.2, 0.05 }; // levels of zoom this has
+                fovGimbalSpeedModifiers[] = { 1, 1 }; // the modifier for gimbal speed when at the zoom level
                 initialFOV = 0.2;
                 lerpFOV = 0;
                 fovChangeTime = 1;
+                
+                alwaysDesignate = 0;            // always designate
+                designateWhenStationary = 0;    // designate when camera doenst have any inputs
                 
                 enabledThermalTypes[] = { "white_hot_black_cold", "black_hot_white_cold" };
                 initialThermalType = "white_hot_black_cold";

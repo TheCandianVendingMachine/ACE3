@@ -15,11 +15,10 @@
  *
  * Public: No
  */
-params ["_increase"];
- 
-private _zoomIndex = GVAR(activeCamera) getVariable [QGVAR(currentZoomIndex), 0];
-private _zoomArray = GVAR(activeCamera) getVariable [QGVAR(fovLevels), []];
-private _camera = GVAR(activeCamera) getVariable [QGVAR(camera), objNull];
+params ["_cameraNamespace", "_increase"];
+
+private _zoomIndex = _cameraNamespace getVariable [QGVAR(currentZoomIndex), 0];
+private _zoomArray = _cameraNamespace getVariable [QGVAR(fovLevels), []];
 
 if ((count _zoomArray) == 0) exitWith {};
 if (_increase) then {
@@ -31,9 +30,5 @@ if (_increase) then {
         _zoomIndex = _zoomIndex - 1;
     };
 };
+[_cameraNamespace, _zoomIndex] call FUNC(camera_setZoom);
 
-GVAR(activeCamera) setVariable [QGVAR(currentZoomIndex), _zoomIndex];
-GVAR(activeCamera) setVariable [QGVAR(targetFOV), _zoomArray select _zoomIndex];
-GVAR(activeCamera) setVariable [QGVAR(fovChanged), true];
-GVAR(activeCamera) setVariable [QGVAR(fovChangedTime), CBA_missionTime];
-GVAR(activeCamera) setVariable [QGVAR(startingFov), GVAR(activeCamera) getVariable QGVAR(currentFOV)];

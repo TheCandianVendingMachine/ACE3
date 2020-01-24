@@ -382,7 +382,19 @@ if (!(_cameraConfig isEqualTo configNull) && { (getNumber (_cameraConfig >> "ena
     
     _cameraArray set [8, [[0, 0, 0], [0, 0, 0], [0, 0, 0], false]]; // camera view data. [look direction, ground pos, point pos, moving camera]
     
-    _cameraArray set [9, [(getNumber (_cameraConfig >> "gimbal")) == 1, getNumber (_cameraConfig >> "gimbalAngleX"), getNumber (_cameraConfig >> "gimbalAngleY"), getNumber (_cameraConfig >> "gimbalSpeedX"), getNumber (_cameraConfig >> "gimbalSpeedY")]];
+    _cameraArray set [9, [
+        (getNumber (_cameraConfig >> "gimbal")) == 1,
+        getNumber (_cameraConfig >> "gimbalAngleX"),
+        getNumber (_cameraConfig >> "gimbalAngleY"),
+        getNumber (_cameraConfig >> "gimbalSpeedX"),
+        getNumber (_cameraConfig >> "gimbalSpeedY"),
+        getNumber (_cameraConfig >> "gimbalInitOffsetX"),
+        getNumber (_cameraConfig >> "gimbalInitOffsetY"),
+        getArray (_cameraConfig >> "fovGimbalSpeedModifiers")
+    ]];
+    
+    _cameraArray set [10, (getNumber (_cameraConfig >> "alwaysDesignate")) == 1];
+    _cameraArray set [11, (getNumber (_cameraConfig >> "designateWhenStationary")) == 1];
 };
 
 [_seekerType, _attackProfile, _target, _targetPos, _targetVector, _launchPos, _launchTime, _miscManeuvering, _miscSensor, _miscSeeker, _miscProfile, _miscFuze, _cameraArray];

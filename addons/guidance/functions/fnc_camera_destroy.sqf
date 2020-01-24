@@ -15,7 +15,15 @@
  *
  * Public: No
  */
- 
+params ["_cameraNamespace"];
+
 [] call FUNC(camera_switchAway);
-private _camera = GVAR(activeCamera) getVariable QGVAR(camera);
+
+private _key = _cameraNamespace getVariable [QGVAR(missile), objNull];
+[GVAR(projectileCameraHash), objNull] call CBA_fnc_hashRem;
+
+private _logic = _cameraNamespace getVariable [QGVAR(logic), objNull];
+deleteVehicle _logic;
+
+private _camera = _cameraNamespace getVariable QGVAR(camera);
 camDestroy _camera;

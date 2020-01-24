@@ -15,9 +15,9 @@
  *
  * Public: No
  */
- 
-if !([] call FUNC(camera_userInCamera)) exitWith {};
- 
-private _camera = GVAR(activeCamera) getVariable QGVAR(camera);
-_camera cameraEffect ["terminate", "back"];
-GVAR(activeCamera) = objNull;
+params [["_cameraNamespace", objNull]];
+
+if (isNil QGVAR(activeCamera)) exitWith { false };
+
+(!(GVAR(activeCamera) isEqualTo objNull)) && { (_cameraNamespace isEqualTo objNull) || (_cameraNamespace isEqualTo GVAR(activeCamera)) };
+

@@ -15,9 +15,6 @@
  *
  * Public: No
  */
- 
-if !([] call FUNC(camera_userInCamera)) exitWith {};
- 
-private _camera = GVAR(activeCamera) getVariable QGVAR(camera);
-_camera cameraEffect ["terminate", "back"];
-GVAR(activeCamera) = objNull;
+params ["_projectile"];
+
+[GVAR(projectileCameraHash), _projectile] call CBA_fnc_hashGet;

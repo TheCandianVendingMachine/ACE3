@@ -81,8 +81,23 @@
 },
 [74, [false, false, false]], false] call CBA_fnc_addKeybind;  //Keypad-
 
-GVAR(activeCamera) = [];
-GVAR(activeCameraNamespace) = objNull;
-GVAR(inCamera) = false;
+GVAR(projectileCameraHash) = [[], objNull] call CBA_fnc_hashCreate;
+GVAR(activeCamera) = objNull;
+
+// add camera interactions
+private _switchToCameraAction = ["SwitchToCamera", "Switch To Missile Camera", "", {
+    // statement
+    params ["_target", "_player", "_params"];
+    private _camera = _player getVariable [QGVAR(missileCamera), objNull];
+    [_camera] call FUNC(camera_switchTo);
+}, {
+    // condition
+    params ["_target", "_player", "_params"];
+    true
+}/*, {
+    params ["_target", "_player", "_params"];
+    // insert children
+}*/] call EFUNC(interact_menu,createAction);
+["CAManBase", 1, ["ACE_SelfActions"], _switchToCameraAction, true] call EFUNC(interact_menu,addActionToClass);
 
 true

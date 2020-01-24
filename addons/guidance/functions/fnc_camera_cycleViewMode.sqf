@@ -15,9 +15,10 @@
  *
  * Public: No
  */
- 
-private _tiIndex = GVAR(activeCamera) getVariable [QGVAR(currentTIModeIndex), 0];
-private _tiArray = GVAR(activeCamera) getVariable [QGVAR(thermalTypes), []];
+params ["_cameraNamespace"];
+
+private _tiIndex = _cameraNamespace getVariable [QGVAR(currentTIModeIndex), 0];
+private _tiArray = _cameraNamespace getVariable [QGVAR(thermalTypes), []];
 
 if ((count _tiArray) == 0) exitWith {};
 if ((_tiIndex + 1) >= count _tiArray) then {
@@ -26,6 +27,6 @@ if ((_tiIndex + 1) >= count _tiArray) then {
     _tiIndex = _tiIndex + 1;
 };
 
-GVAR(activeCamera) setVariable [QGVAR(currentTIModeIndex), _tiIndex];
+_cameraNamespace setVariable [QGVAR(currentTIModeIndex), _tiIndex];
 
-[_tiArray select _tiIndex] call FUNC(camera_setViewMode);
+[_cameraNamespace, _tiArray select _tiIndex] call FUNC(camera_setViewMode);

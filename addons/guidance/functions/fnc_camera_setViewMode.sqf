@@ -15,16 +15,25 @@
  *
  * Public: No
  */
-params ["_viewMode"];
+params ["_cameraNamespace", "_viewMode"];
 
-camUseNVG false;
-false setCamUseTI (GVAR(activeCamera) getVariable [QGVAR(tiMode), 0]);
+private _userInCamera = [] call FUNC(camera_userInCamera);
+
+if (_userInCamera) then {
+    camUseNVG false;
+    false setCamUseTI (_cameraNamespace getVariable [QGVAR(tiMode), 0]);
+};
 
 private _thermalMode = ["normal", "nvg", "white_hot_black_cold", "black_hot_white_cold", "light_green_hot_dark_green_cold", "black_hot_green_cold", "light_red_hot_dark_red_cold", "black_hot_red_cold", "white_hot_red_cold", "predator"] findIf { _viewMode isEqualTo _x };
 if (_thermalMode > 1) then {
-    true setCamUseTI (_thermalMode - 2);
+    if (_userInCamera) then {
+        true setCamUseTI (_thermalMode - 2);
+    };
 };
 if (_thermalMode == 1) then {
-    camUseNVG true;
+    if (_userInCamera) then {
+        camUseNVG true;
+    };
 };
-GVAR(activeCamera) setVariable [QGVAR(tiMode), _thermalMode - 2];
+_cameraNamespace setVariable [QGVAR(tiMode), _thermalMode - 2];
+_cameraNamespace setVariable [QGVAR(tiModeString), _viewMode];

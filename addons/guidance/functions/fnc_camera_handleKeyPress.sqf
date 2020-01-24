@@ -17,6 +17,8 @@
  */
 params ["_key", "_down"];
 
+if !([objNull] call FUNC(camera_userInCamera)) exitWith {};
+
 private _return = false;
 private _lookInput = GVAR(activeCamera) getVariable [QGVAR(lookInput), [0, 0, 0, 0]];
 private _designateInput = GVAR(activeCamera) getVariable [QGVAR(designateInput), [0]];
@@ -30,6 +32,9 @@ switch (_key) do {
         };
         _return = true;
     }; //MF key 1
+    case 2: {
+        [] call FUNC(camera_switchAway);
+    }; // MF Key 2
     case 3: {
         if (_down) then {
             _lookInput set [0, 1];
@@ -67,19 +72,19 @@ switch (_key) do {
     }; //Down
     case 7: {
         if(_down) then {
-            [] call FUNC(camera_cycleViewMode);
+            [GVAR(activeCamera)] call FUNC(camera_cycleViewMode);
         };
         _return = true;
     }; //N
     case 8: {
         if(_down) then {
-            [true] call FUNC(camera_changeZoom);
+            [GVAR(activeCamera), true] call FUNC(camera_changeZoom);
         };
         _return = true;
     }; // Num+
     case 9: {
         if(_down) then {
-            [false] call FUNC(camera_changeZoom);
+            [GVAR(activeCamera), false] call FUNC(camera_changeZoom);
         };
         _return = true;
     }; // Num-

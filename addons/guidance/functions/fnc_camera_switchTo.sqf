@@ -15,8 +15,13 @@
  *
  * Public: No
  */
+params ["_cameraNamespace"];
 
-private _camera = GVAR(activeCamera) getVariable QGVAR(camera);
-private _projectile = GVAR(activeCamera) getVariable QGVAR(missile);
+if ([] call FUNC(camera_userInCamera)) exitWith {};
+private _camera = _cameraNamespace getVariable QGVAR(camera);
+private _projectile = _cameraNamespace getVariable QGVAR(missile);
 _camera cameraEffect ["internal", "BACK"];
-_projectile hideObject true;
+GVAR(activeCamera) = _cameraNamespace;
+[_cameraNamespace, _cameraNamespace getVariable [QGVAR(tiModeString), "normal"]] call FUNC(camera_setViewMode);
+[_cameraNamespace, _cameraNamespace getVariable [QGVAR(currentZoomIndex), 0]] call FUNC(camera_setZoom);
+

@@ -364,4 +364,38 @@ private _miscManeuvering = [_degreesPerSecond, _glideAngle, diag_tickTime, time,
 private _miscSensor = [_sensorAngle, _sensorMinRange, _sensorMaxRange];
 private _miscFuze = [_fuzeVehicle, _fuzeAlt, _fuzeRange, _fuzeTime, _fuzeLoc];
 
-[_seekerType, _attackProfile, _target, _targetPos, _targetVector, _launchPos, _launchTime, _miscManeuvering, _miscSensor, _miscSeeker, _miscProfile, _miscFuze];
+// Setup camera array
+private _cameraConfig = _config >> "camera";
+private _cameraArray = [false];
+if (!(_cameraConfig isEqualTo configNull) && { (getNumber (_cameraConfig >> "enabled")) == 1 }) then {
+    _cameraArray set [0, true];
+    _cameraArray set [1, getArray (_cameraConfig >> "fovLevels")];
+    _cameraArray set [2, getNumber (_cameraConfig >> "initialFOV")];
+    
+    _cameraArray set [3, getArray (_cameraConfig >> "enabledThermalTypes")];
+    _cameraArray set [4, getText (_cameraConfig >> "initialThermalType")];
+    
+    _cameraArray set [5, (getNumber (_cameraConfig >> "switchOnFire")) == 1];
+    
+    _cameraArray set [6, getNumber (_cameraConfig >> "lerpFOV")];
+    _cameraArray set [7, getNumber (_cameraConfig >> "fovChangeTime")];
+    
+    _cameraArray set [8, [[0, 0, 0], [0, 0, 0], [0, 0, 0], false, false]]; // camera view data. [look direction, ground pos, point pos, moving camera x, moving camera y]
+    
+    _cameraArray set [9, [
+        (getNumber (_cameraConfig >> "gimbal")) == 1,
+        getNumber (_cameraConfig >> "gimbalAngleX"),
+        getNumber (_cameraConfig >> "gimbalAngleY"),
+        getNumber (_cameraConfig >> "gimbalSpeedX"),
+        getNumber (_cameraConfig >> "gimbalSpeedY"),
+        getNumber (_cameraConfig >> "gimbalInitOffsetX"),
+        getNumber (_cameraConfig >> "gimbalInitOffsetY"),
+        getArray (_cameraConfig >> "fovGimbalSpeedModifiers"),
+        getNumber (_cameraConfig >> "stabilizeWhenMoving") == 1
+    ]];
+    
+    _cameraArray set [10, (getNumber (_cameraConfig >> "alwaysDesignate")) == 1];
+    _cameraArray set [11, (getNumber (_cameraConfig >> "designateWhenStationary")) == 1];
+};
+
+[_seekerType, _attackProfile, _target, _targetPos, _targetVector, _launchPos, _launchTime, _miscManeuvering, _miscSensor, _miscSeeker, _miscProfile, _miscFuze, _cameraArray];

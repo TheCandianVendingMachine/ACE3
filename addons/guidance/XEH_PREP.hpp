@@ -34,3 +34,16 @@ PREP(seekerType_SACLOS);
 PREP(seekerType_PLOS);
 PREP(seekerType_MCLOS);
 PREP(seekerType_SALH);
+
+PREP(camera_init);
+PREP(camera_update);
+PREP(camera_switchTo);
+PREP(camera_switchAway);
+PREP(camera_destroy);
+PREP(camera_cycleViewMode);
+PREP(camera_setViewMode);
+PREP(camera_changeZoom);
+PREP(camera_setZoom);
+PREP(camera_handleKeyPress);
+PREP(camera_userInCamera);
+PREP(camera_getCameraNamespaceFromProjectile);

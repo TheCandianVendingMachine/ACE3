@@ -73,5 +73,14 @@
         <Key ID="STR_ACE_Guidance_MFKeyRight">
             <English>Guidance Multifunction Key Right</English>
         </Key>
+        <Key ID="STR_ACE_Guidance_Camera_ViewModeCycle">
+            <English>Guidance Camera - Switch View Mode</English>
+        </Key>
+        <Key ID="STR_ACE_Guidance_Camera_ZoomIncrease">
+            <English>Guidance Camera - Increase Zoom</English>
+        </Key>
+        <Key ID="STR_ACE_Guidance_Camera_ZoomDecrease">
+            <English>Guidance Camera - Decrease Zoom</English>
+        </Key>
     </Package>
 </Project>

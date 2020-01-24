@@ -54,4 +54,51 @@
 },
 [208, [false, false, false]], false] call CBA_fnc_addKeybind;  //Down
 
+["ACE3 Weapons", QGVAR(Camera_N), localize LSTRING(Camera_ViewModeCycle),
+{
+    [7, true] call FUNC(keyDown);
+},
+{
+    [7, false] call FUNC(keyDown);
+},
+[49, [false, false, false]], false] call CBA_fnc_addKeybind;  //N
+
+["ACE3 Weapons", QGVAR(Camera_NumPlus), localize LSTRING(Camera_ZoomIncrease),
+{
+    [8, true] call FUNC(keyDown);
+},
+{
+    [8, false] call FUNC(keyDown);
+},
+[78, [false, false, false]], false] call CBA_fnc_addKeybind;  //Keypad+
+
+["ACE3 Weapons", QGVAR(Camera_NumMinus), localize LSTRING(Camera_ZoomDecrease),
+{
+    [9, true] call FUNC(keyDown);
+},
+{
+    [9, false] call FUNC(keyDown);
+},
+[74, [false, false, false]], false] call CBA_fnc_addKeybind;  //Keypad-
+
+GVAR(projectileCameraHash) = [[], objNull] call CBA_fnc_hashCreate;
+GVAR(activeCamera) = objNull;
+
+// add camera interactions
+private _switchToCameraAction = ["SwitchToCamera", "Switch To Missile Camera", "", {
+    // statement
+    params ["_target", "_player", "_params"];
+    private _camera = _player getVariable [QGVAR(missileCamera), objNull];
+    [_camera] call FUNC(camera_switchTo);
+}, {
+    // condition
+    params ["_target", "_player", "_params"];
+    private _camera = _player getVariable [QGVAR(missileCamera), objNull];
+    !([] call FUNC(camera_userInCamera)) && { !(_camera isEqualTo objNull); }
+}/*, {
+    params ["_target", "_player", "_params"];
+    // insert children
+}*/] call EFUNC(interact_menu,createAction);
+["CAManBase", 1, ["ACE_SelfActions"], _switchToCameraAction, true] call EFUNC(interact_menu,addActionToClass);
+
 true

@@ -44,7 +44,8 @@ _legacy = false;
 if ((_legacyEnabled > 0) && !(_enabled > 0)) then {_legacy = true};
 
 private _extractedInfo = [_this,_legacy] call FUNC(extractInfo);
-
+_extractedInfo params ["", "", "", "", "", "", "", "", "", "", "", "", "_cameraArray"];
+[_projectile, _cameraArray, _shooter] call FUNC(camera_init);
 
 _args = [_this, _extractedInfo];
 

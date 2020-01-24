@@ -134,11 +134,42 @@ class CfgAmmo {
         class ADDON {
             enabled = 1;
             
-            defaultSeekerType = "MCLOS";
-            seekerTypes[] = {"MCLOS"};
+            defaultSeekerType = "EO";
+            seekerTypes[] = {"EO"};
 
             defaultSeekerLockMode = "LIN";
             seekerLockModes[] = {"LIN"};
+            
+            // TV Guided projectiles have extra data that is irrelevant to most missiles
+            class camera {
+                enabled = 1;
+                switchOnFire = 1; // switch to the camera view immediately upon firing
+                
+                gimbal = 1;
+                
+                gimbalAngleX = 45; // how far left/right can this look in degrees
+                gimbalAngleY = 45; // how far up/down can this look in degrees
+                gimbalSpeedX = 10;  // how many fast we can look left and right
+                gimbalSpeedY = 10;  // how many fast we can look up and down
+                
+                gimbalInitOffsetX = 0;
+                gimbalInitOffsetY = -20;
+                
+                stabilizeWhenMoving = 1;
+                
+                fovLevels[] = { 0.2, 0.05 }; // levels of zoom this has
+                fovGimbalSpeedModifiers[] = { 1, 1 }; // the modifier for gimbal speed when at the zoom level
+                initialFOV = 0.2;
+                lerpFOV = 0;
+                fovChangeTime = 1;
+                
+                alwaysDesignate = 0;            // always designate
+                designateWhenStationary = 0;    // designate when camera doenst have any inputs
+                
+                enabledThermalTypes[] = { "white_hot_black_cold", "black_hot_white_cold" };
+                initialThermalType = "white_hot_black_cold";
+                
+            };
 
             seekerAngle = 90;           // Angle in front of the missile which can be searched
             seekerAccuracy = 1;         // seeker accuracy multiplier

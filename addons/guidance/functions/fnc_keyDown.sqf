@@ -76,4 +76,7 @@ switch (_key) do {
     }; //Down
 
 };
+
+_this call FUNC(camera_handleKeyPress);
+
 _return;

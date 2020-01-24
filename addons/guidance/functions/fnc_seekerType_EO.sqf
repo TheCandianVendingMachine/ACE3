@@ -22,7 +22,7 @@ _miscManeuvering params ["_degreesPerSecond", "_glideAngle", "_lastTickTime", "_
 _miscSensor params ["_seekerAngle", "_seekerMinRange", "_seekerMaxRange"];
 _miscSeeker params ["_active", "_focusPoint", "_points"];
 _miscCamera params ["_hasCamera", "", "", "", "", "", "", "", "_viewData", "", "_designating"];
-_viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCamera"];
+_viewData params ["_lookDir", "_groundPos", "_pointPos"];
 
 if(!_active) exitWith {[0,0,0]};
 

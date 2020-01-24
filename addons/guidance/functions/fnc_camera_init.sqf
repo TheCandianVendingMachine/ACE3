@@ -78,9 +78,10 @@ if (_designating) then {
     _activeCameraNamespace setVariable [QGVAR(alwaysDesignate), true];
 };
 
-[GVAR(projectileCameraHash), _projectile, _activeCameraNamespace] call CBA_fnc_hashSet;
-
 _shooter setVariable [QGVAR(missileCamera), _activeCameraNamespace];
+_activeCameraNamespace setVariable [QGVAR(shooter), _shooter];
+
+[GVAR(projectileCameraHash), _projectile, _activeCameraNamespace] call CBA_fnc_hashSet;
 
 [_activeCameraNamespace, _initialThermalType] call FUNC(camera_setViewMode);
 

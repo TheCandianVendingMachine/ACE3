@@ -93,7 +93,8 @@ private _switchToCameraAction = ["SwitchToCamera", "Switch To Missile Camera", "
 }, {
     // condition
     params ["_target", "_player", "_params"];
-    true
+    private _camera = _player getVariable [QGVAR(missileCamera), objNull];
+    !([] call FUNC(camera_userInCamera)) && { !(_camera isEqualTo objNull); }
 }/*, {
     params ["_target", "_player", "_params"];
     // insert children

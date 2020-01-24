@@ -27,3 +27,9 @@ deleteVehicle _logic;
 
 private _camera = _cameraNamespace getVariable QGVAR(camera);
 camDestroy _camera;
+
+private _shooter = _cameraNamespace getVariable [QGVAR(shooter), objNull];
+_shooter setVariable [QGVAR(missileCamera), objNull];
+
+GVAR(activeCamera) = objNull;
+_cameraNamespace call CBA_fnc_deleteNamespace;

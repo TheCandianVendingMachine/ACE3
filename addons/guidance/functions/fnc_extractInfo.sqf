@@ -380,7 +380,7 @@ if (!(_cameraConfig isEqualTo configNull) && { (getNumber (_cameraConfig >> "ena
     _cameraArray set [6, getNumber (_cameraConfig >> "lerpFOV")];
     _cameraArray set [7, getNumber (_cameraConfig >> "fovChangeTime")];
     
-    _cameraArray set [8, [[0, 0, 0], [0, 0, 0], [0, 0, 0], false]]; // camera view data. [look direction, ground pos, point pos, moving camera]
+    _cameraArray set [8, [[0, 0, 0], [0, 0, 0], [0, 0, 0], false, false]]; // camera view data. [look direction, ground pos, point pos, moving camera x, moving camera y]
     
     _cameraArray set [9, [
         (getNumber (_cameraConfig >> "gimbal")) == 1,
@@ -390,7 +390,8 @@ if (!(_cameraConfig isEqualTo configNull) && { (getNumber (_cameraConfig >> "ena
         getNumber (_cameraConfig >> "gimbalSpeedY"),
         getNumber (_cameraConfig >> "gimbalInitOffsetX"),
         getNumber (_cameraConfig >> "gimbalInitOffsetY"),
-        getArray (_cameraConfig >> "fovGimbalSpeedModifiers")
+        getArray (_cameraConfig >> "fovGimbalSpeedModifiers"),
+        getNumber (_cameraConfig >> "stabilizeWhenMoving") == 1
     ]];
     
     _cameraArray set [10, (getNumber (_cameraConfig >> "alwaysDesignate")) == 1];

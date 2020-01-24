@@ -18,7 +18,7 @@
 params ["_extractedInfo", "_projectile"];
 _extractedInfo params ["", "", "", "", "", "", "", "_miscManeuvering", "", "", "", "", "_cameraArray"];
 _cameraArray params ["", "", "", "", "", "", "", "", "_viewData", "_gimbalData", "_designating", "_designateWhenStationary"];
-_viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCamera"];
+_viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCameraX", "_movingCameraY", "_stabilizeWhenMoving"];
 _gimbalData params ["_hasGimbal", "_maxGimbalX", "_maxGimbalY", "_gimbalSpeedX", "_gimbalSpeedY", "", "", "_gimbalZoomSpeedModifiers"];
 
 private _cameraNamespace = [_projectile] call FUNC(camera_getCameraNamespaceFromProjectile);
@@ -69,6 +69,9 @@ if (_fovChanged) then {
     _cameraNamespace setVariable [QGVAR(currentFOV), _setFOV];
 };
 
+_movingCameraX = false;
+_movingCameraY = false;
+
 private _relativePos = _cameraNamespace getVariable [QGVAR(logicPos), [0, 10, 0] vectorAdd _missileRelativeOffset];
 if (_hasGimbal) then {
     _miscManeuvering params ["", "", "", "", "_deltaTime"];
@@ -76,8 +79,10 @@ if (_hasGimbal) then {
     private _lookInput = _cameraNamespace getVariable [QGVAR(lookInput), [0, 0, 0, 0]];
     _lookInput params ["_up", "_down", "_left", "_right"];
        
+   _movingCameraX = (_right - _left) != 0;
+   _movingCameraY = (_up - _down) != 0;
+       
     if ((_lookInput find 1) < 0) then {
-        _movingCamera = false;
         private _lastGroundPos = _cameraNamespace getVariable [QGVAR(lastMovedGroundPos), [0, 0, 0]];
         
         // If we designate a target set the current tracking point to the current ground point to avoid unwanted behavior from static cameras
@@ -119,9 +124,6 @@ if (_hasGimbal) then {
             };
         };
     } else {
-        _movingCamera = true;
-
-        _gimbalZoomSpeedModifiers = [1, 0.7];
         private _speedModifier = 1;
         if !(_gimbalZoomSpeedModifiers isEqualTo []) then {
             _speedModifier = (_gimbalZoomSpeedModifiers select (_cameraNamespace getVariable [QGVAR(currentZoomIndex), 0]));
@@ -130,8 +132,41 @@ if (_hasGimbal) then {
         private _posX = (_speedModifier * _gimbalSpeedX * _deltaTime * (_right - _left));
         private _posY = (_speedModifier * _gimbalSpeedY * _deltaTime * (_up - _down));
                
-        private _angleX = atan ((_relativePos#0) / (_relativePos#1));
-        private _angleY = atan ((_relativePos#2) / (_relativePos#1));
+        // carbon copy of the ground stabilization code. DRY and all that but this is a special case
+        _stabilizeWhenMoving = true;
+        if (_stabilizeWhenMoving) then {
+            private _relativePosOffset = _relativePos vectorDiff _missileRelativeOffset;
+
+            // stabilize camera when moving in an axis (if enabled)
+            if ((_right - _left) == 0) then {
+                private _lastGroundPosX = _cameraNamespace getVariable [QGVAR(lastMovedGroundPosX), [0, 0, 0]];
+                if !(_lastGroundPosX isEqualTo [0, 0, 0]) then {
+                    private _relativeGround = AGLtoASL (_projectile worldToModelVisual ASLtoAGL _lastGroundPosX);
+                    private _distToGround = vectorMagnitude _relativeGround;
+                    private _relativePosDiff = (vectorNormalized _relativePosOffset) vectorMultiply _distToGround;
+                
+                    private _dx = (_relativeGround#0) - (_relativePosDiff#0); // difference between looking position on ground and last ground position
+                    private _distToRp0 = sqrt ((_relativePosOffset#1)^2 + (_relativePosOffset#0)^2);
+                    _posX = (_distToRp0 * _dx) / _distToGround;
+                };
+            };
+
+            if ((_up - _down) == 0) then {
+                private _lastGroundPosY = _cameraNamespace getVariable [QGVAR(lastMovedGroundPosY), [0, 0, 0]];
+                if !(_lastGroundPosY isEqualTo [0, 0, 0]) then {
+                    private _relativeGround = AGLtoASL (_projectile worldToModelVisual ASLtoAGL _lastGroundPosY);
+                    private _distToGround = vectorMagnitude _relativeGround;
+                    private _relativePosDiff = (vectorNormalized _relativePosOffset) vectorMultiply _distToGround;
+                
+                    private _dy = (_relativeGround#2) - (_relativePosDiff#2);
+                    private _distToRp2 = sqrt ((_relativePosOffset#1)^2 + (_relativePosOffset#2)^2);
+                    _posY = (_distToRp2 * _dy) / _distToGround;
+                };
+            };
+        };
+               
+        private _angleX = atan ((_relativePos#0 + _posX) / (_relativePos#1));
+        private _angleY = atan ((_relativePos#2 + _posY) / (_relativePos#1));
         if (_maxGimbalX - (abs _angleX) > 0) then {
             _relativePos set [0, _relativePos#0 + _posX];
         };
@@ -142,7 +177,7 @@ if (_hasGimbal) then {
 };
 
 _designating = _cameraNamespace getVariable [QGVAR(alwaysDesignate), false] || { (_cameraNamespace getVariable [QGVAR(designateInput), [0]])#0 == 1 };
-if (_designateWhenStationary && !_movingCamera) then {
+if (_designateWhenStationary && !(_movingCameraX || _movingCameraY)) then {
     _designating = true;
 };
 _cameraArray set [10, _designating];
@@ -168,7 +203,13 @@ if (count _surfaceIntersections > 0) then {
     _pointPos = (_surfaceIntersections select 0) select 0;
 };
 
-if (_movingCamera) then {
+if (_movingCameraX) then {
+    _cameraNamespace setVariable [QGVAR(lastMovedGroundPosX), _groundPos];
+};
+if (_movingCameraY) then {
+    _cameraNamespace setVariable [QGVAR(lastMovedGroundPosY), _groundPos];
+};
+if (_movingCameraX || _movingCameraY) then {
     _cameraNamespace setVariable [QGVAR(lastMovedGroundPos), _groundPos];
 };
 
@@ -181,7 +222,8 @@ drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 1, 0, 1], AS
 _viewData set [0, _lookDir];
 _viewData set [1, _groundPos];
 _viewData set [2, _pointPos];
-_viewData set [3, _movingCamera];
+_viewData set [3, _movingCameraX];
+_viewData set [4, _movingCameraY];
 _cameraArray set [8, _viewData];
 _extractedInfo set [12, _cameraArray];
 

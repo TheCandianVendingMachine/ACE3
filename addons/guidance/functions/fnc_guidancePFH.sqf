@@ -30,7 +30,7 @@ _miscFuze params ["_fuzeVehicle", "_fuzeAlt", "_fuzeRange", "_fuzeTime", "_fuzeL
 
 
 if (!alive _projectile || isNull _projectile || isNull _shooter) exitWith {
-    [] call FUNC(camera_destroy);
+    [[_projectile] call FUNC(camera_getCameraNamespaceFromProjectile)] call FUNC(camera_destroy);
     [_pfID] call CBA_fnc_removePerFrameHandler;
     END_COUNTER(guidancePFH);
 };
@@ -84,7 +84,7 @@ if(time - _launchTime > 0.75) then {
 };
 
 if ([_projectile, _miscFuze] call FUNC(checkFuze)) exitWith {
-    [] call FUNC(camera_destroy);
+    [[_projectile] call FUNC(camera_getCameraNamespaceFromProjectile)] call FUNC(camera_destroy);
     [_pfID] call CBA_fnc_removePerFrameHandler;
     END_COUNTER(guidancePFH);
     triggerAmmo _projectile;

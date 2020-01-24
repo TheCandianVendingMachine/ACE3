@@ -155,6 +155,8 @@ class CfgAmmo {
                 gimbalInitOffsetX = 0;
                 gimbalInitOffsetY = -20;
                 
+                stabilizeWhenMoving = 1;
+                
                 fovLevels[] = { 0.2, 0.05 }; // levels of zoom this has
                 fovGimbalSpeedModifiers[] = { 1, 1 }; // the modifier for gimbal speed when at the zoom level
                 initialFOV = 0.2;

@@ -15,12 +15,17 @@
  *
  * Public: No
  */
-params ["_cameraNamespace"];
+params ["_cameraNamespace", "_projectile"];
 
-[] call FUNC(camera_switchAway);
+private _userInThisCamera = [_cameraNamespace] call FUNC(camera_userInCamera);
+private _userCamera = player getVariable [QGVAR(missileCamera), objNull];
+if (_userInThisCamera || { _userCamera isEqualTo _cameraNamespace }) then {
+    player setVariable [QGVAR(missileCamera), objNull];
+};
+
+[_cameraNamespace] call FUNC(camera_switchAway);
 
 private _key = _cameraNamespace getVariable [QGVAR(missile), objNull];
-[GVAR(projectileCameraHash), objNull] call CBA_fnc_hashRem;
 
 private _logic = _cameraNamespace getVariable [QGVAR(logic), objNull];
 deleteVehicle _logic;
@@ -28,8 +33,5 @@ deleteVehicle _logic;
 private _camera = _cameraNamespace getVariable QGVAR(camera);
 camDestroy _camera;
 
-private _shooter = _cameraNamespace getVariable [QGVAR(shooter), objNull];
-_shooter setVariable [QGVAR(missileCamera), objNull];
-
-GVAR(activeCamera) = objNull;
 _cameraNamespace call CBA_fnc_deleteNamespace;
+

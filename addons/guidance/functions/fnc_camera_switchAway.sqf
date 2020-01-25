@@ -15,9 +15,13 @@
  *
  * Public: No
  */
- 
-if !([] call FUNC(camera_userInCamera)) exitWith {};
- 
+params [["_cameraNamespace", objNull]];
+
+if !([_cameraNamespace] call FUNC(camera_userInCamera)) exitWith {};
+
 private _camera = GVAR(activeCamera) getVariable QGVAR(camera);
 _camera cameraEffect ["terminate", "back"];
 GVAR(activeCamera) = objNull;
+
+QGVAR(camera_hud) cutText ["", "PLAIN"];
+

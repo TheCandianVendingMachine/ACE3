@@ -17,7 +17,7 @@
  * Public: No
  */
 params ["_projectile", "_cameraArray", "_shooter"];
-_cameraArray params ["_enabled", "_fovLevels", "_initialFOV", "_thermalTypes", "_initialThermalType", "_switchOnFire", "_lerpFOV", "_fovChangeTime", "", "_gimbalData", "_designating"];
+_cameraArray params ["_enabled", "_fovLevels", "_initialFOV", "_thermalTypes", "_initialThermalType", "_switchOnFire", "_lerpFOV", "_fovChangeTime", "", "_gimbalData", "_reticleData", "_designating"];
 _gimbalData params ["_hasGimbal", "_maxGimbalX", "_maxGimbalY", "_gimbalSpeedX", "_gimbalSpeedY", "_initGimbalAngleX", "_initGimbalAngleY", "_gimbalZoomSpeedModifiers"];
  
 if !(_enabled) exitWith {};
@@ -77,6 +77,8 @@ _activeCameraNamespace setVariable [QGVAR(currentTIModeIndex), _currentTIIndex];
 if (_designating) then {
     _activeCameraNamespace setVariable [QGVAR(alwaysDesignate), true];
 };
+
+_activeCameraNamespace setVariable [QGVAR(reticleData), _reticleData];
 
 _shooter setVariable [QGVAR(missileCamera), _activeCameraNamespace];
 _activeCameraNamespace setVariable [QGVAR(shooter), _shooter];

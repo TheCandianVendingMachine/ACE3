@@ -383,19 +383,34 @@ if (!(_cameraConfig isEqualTo configNull) && { (getNumber (_cameraConfig >> "ena
     _cameraArray set [8, [[0, 0, 0], [0, 0, 0], [0, 0, 0], false, false]]; // camera view data. [look direction, ground pos, point pos, moving camera x, moving camera y]
     
     _cameraArray set [9, [
-        (getNumber (_cameraConfig >> "gimbal")) == 1,
-        getNumber (_cameraConfig >> "gimbalAngleX"),
-        getNumber (_cameraConfig >> "gimbalAngleY"),
-        getNumber (_cameraConfig >> "gimbalSpeedX"),
-        getNumber (_cameraConfig >> "gimbalSpeedY"),
-        getNumber (_cameraConfig >> "gimbalInitOffsetX"),
-        getNumber (_cameraConfig >> "gimbalInitOffsetY"),
-        getArray (_cameraConfig >> "fovGimbalSpeedModifiers"),
-        getNumber (_cameraConfig >> "stabilizeWhenMoving") == 1
+        getNumber (_cameraConfig >> "gimbal" >> "enabled") == 1,
+        getNumber (_cameraConfig >> "gimbal" >> "gimbalAngleX"),
+        getNumber (_cameraConfig >> "gimbal" >> "gimbalAngleY"),
+        getNumber (_cameraConfig >> "gimbal" >> "gimbalSpeedX"),
+        getNumber (_cameraConfig >> "gimbal" >> "gimbalSpeedY"),
+        getNumber (_cameraConfig >> "gimbal" >> "gimbalInitOffsetX"),
+        getNumber (_cameraConfig >> "gimbal" >> "gimbalInitOffsetY"),
+        getArray (_cameraConfig >> "gimbal" >> "fovGimbalSpeedModifiers"),
+        getNumber (_cameraConfig >> "gimbal" >> "stabilizeWhenMoving") == 1,
+        getNumber (_cameraConfig >> "gimbal" >> "designateWhenStationary") == 1,
+        getNumber (_cameraConfig >> "gimbal" >> "trackLockedPosition") == 1
     ]];
     
-    _cameraArray set [10, (getNumber (_cameraConfig >> "alwaysDesignate")) == 1];
-    _cameraArray set [11, (getNumber (_cameraConfig >> "designateWhenStationary")) == 1];
+    _cameraArray set [10, [
+        getText (_cameraConfig >> "reticle" >> "titleRsc"),
+        getNumber (_cameraConfig >> "reticle" >> "centerReticle"),
+        getArray (_cameraConfig >> "reticle" >> "controlsToDisappearOnLock"),
+        getArray (_cameraConfig >> "reticle" >> "controlsToAppearOnLock"),
+        getNumber (_cameraConfig >> "reticle" >> "leftGate"),
+        getNumber (_cameraConfig >> "reticle" >> "rightGate"),
+        getNumber (_cameraConfig >> "reticle" >> "topGate"),
+        getNumber (_cameraConfig >> "reticle" >> "bottomGate"),
+        getText (_cameraConfig >> "reticle" >> "uiNamespaceDialogVariable"),
+        getNumber (_cameraConfig >> "reticle" >> "reticleMovesWithTrack") == 1
+    ]];
+    
+    _cameraArray set [11, (getNumber (_cameraConfig >> "alwaysDesignate")) == 1];
+    _cameraArray set [12, (getNumber (_cameraConfig >> "canStopDesignating")) == 1];
 };
 
 [_seekerType, _attackProfile, _target, _targetPos, _targetVector, _launchPos, _launchTime, _miscManeuvering, _miscSensor, _miscSeeker, _miscProfile, _miscFuze, _cameraArray];

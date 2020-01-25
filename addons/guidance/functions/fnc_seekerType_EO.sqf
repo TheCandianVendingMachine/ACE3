@@ -21,7 +21,7 @@ _extractedInfo params ["_seekerType", "_attackProfile", "_target", "_targetPos",
 _miscManeuvering params ["_degreesPerSecond", "_glideAngle", "_lastTickTime", "_lastRunTime"];
 _miscSensor params ["_seekerAngle", "_seekerMinRange", "_seekerMaxRange"];
 _miscSeeker params ["_active", "_focusPoint", "_points"];
-_miscCamera params ["_hasCamera", "", "", "", "", "", "", "", "_viewData", "", "_designating"];
+_miscCamera params ["_hasCamera", "", "", "", "", "", "", "", "_viewData", "", "", "_designating"];
 _viewData params ["_lookDir", "_groundPos", "_pointPos"];
 
 if(!_active) exitWith {[0,0,0]};

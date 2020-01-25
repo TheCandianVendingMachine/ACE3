@@ -145,30 +145,46 @@ class CfgAmmo {
                 enabled = 1;
                 switchOnFire = 1; // switch to the camera view immediately upon firing
                 
-                gimbal = 1;
-                
-                gimbalAngleX = 45; // how far left/right can this look in degrees
-                gimbalAngleY = 45; // how far up/down can this look in degrees
-                gimbalSpeedX = 10;  // how many fast we can look left and right
-                gimbalSpeedY = 10;  // how many fast we can look up and down
-                
-                gimbalInitOffsetX = 0;
-                gimbalInitOffsetY = -20;
-                
-                stabilizeWhenMoving = 1;
-                
+                class gimbal {
+                    enabled = 1;
+                    
+                    gimbalAngleX = 45; // how far left/right can this look in degrees
+                    gimbalAngleY = 45; // how far up/down can this look in degrees
+                    gimbalSpeedX = 10;  // how many fast we can look left and right
+                    gimbalSpeedY = 13;  // how many fast we can look up and down
+                    
+                    gimbalInitOffsetX = 0;
+                    gimbalInitOffsetY = -20;
+                    
+                    stabilizeWhenMoving = 1;
+                    trackLockedPosition = 1;
+                    designateWhenStationary = 0;    // designate when camera doenst have any inputs
+                };
+
                 fovLevels[] = { 0.2, 0.05 }; // levels of zoom this has
-                fovGimbalSpeedModifiers[] = { 1, 1 }; // the modifier for gimbal speed when at the zoom level
+                fovGimbalSpeedModifiers[] = { 1, 0.4 }; // the modifier for gimbal speed when at the zoom level
                 initialFOV = 0.2;
                 lerpFOV = 0;
                 fovChangeTime = 1;
                 
                 alwaysDesignate = 0;            // always designate
-                designateWhenStationary = 0;    // designate when camera doenst have any inputs
+                canStopDesignating = 0;
                 
                 enabledThermalTypes[] = { "white_hot_black_cold", "black_hot_white_cold" };
                 initialThermalType = "white_hot_black_cold";
                 
+                class reticle {
+                    titleRsc = "ACE_guidance_spike";
+                    centerReticle = 242000;
+                    controlsToDisappearOnLock[] = { 241000 };
+                    controlsToAppearOnLock[] = { 243101, 243201, 243301 };
+                    leftGate = 243200;
+                    rightGate = 243300;
+                    topGate = 0;
+                    bottomGate = 243100;
+                    uiNamespaceDialogVariable = "ACE_guidance_camera_reticle";
+                    reticleMovesWithTrack = 1;
+                };
             };
 
             seekerAngle = 90;           // Angle in front of the missile which can be searched

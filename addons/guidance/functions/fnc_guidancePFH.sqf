@@ -59,13 +59,13 @@ _miscManeuvering set [4, _runtimeDelta];
 
 private _projPos = getposASL _projectile;
 
-[_extractedInfo, _projectile] call FUNC(camera_update);
-
 // Seeker Search
 private _seekerTargetPos = [_projectile, _shooter, _extractedInfo] call FUNC(runSeekerSearch);
 if (isNil "_seekerTargetPos") then {
     _seekerTargetPos = [0,0,0];
 };
+
+[_extractedInfo, _projectile, _seekerTargetPos] call FUNC(camera_update);
 
 // Attack Profile Search
 private _attackProfileTargetPos = [_projectile, _shooter, _extractedInfo, _seekerTargetPos] call FUNC(runAttackProfile);

@@ -15,6 +15,7 @@ class CfgPatches {
 
 #include "ACE_GuidanceConfig.hpp"
 
+#include "RscTitles.hpp"
 #include "CfgEventhandlers.hpp"
 #include "CfgAmmo.hpp"
 #include "CfgMagazines.hpp"

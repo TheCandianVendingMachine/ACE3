@@ -37,6 +37,7 @@ PREP(seekerType_SALH);
 
 PREP(camera_init);
 PREP(camera_update);
+PREP(camera_updateTargetingGate);
 PREP(camera_switchTo);
 PREP(camera_switchAway);
 PREP(camera_destroy);

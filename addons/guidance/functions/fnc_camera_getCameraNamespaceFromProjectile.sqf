@@ -17,4 +17,8 @@
  */
 params ["_projectile"];
 
+[GVAR(projectileCameraHash), {
+    !((isNil "_key") || { isNull _key })
+}] call CBA_fnc_hashFilter;
 [GVAR(projectileCameraHash), _projectile] call CBA_fnc_hashGet;
+

@@ -15,14 +15,14 @@
  *
  * Public: No
  */
-params ["_extractedInfo", "_projectile"];
+params ["_extractedInfo", "_projectile", "_seekerTargetPos"];
 _extractedInfo params ["", "", "", "", "", "", "", "_miscManeuvering", "", "", "", "", "_cameraArray"];
-_cameraArray params ["", "", "", "", "", "", "", "", "_viewData", "_gimbalData", "_designating", "_designateWhenStationary"];
-_viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCameraX", "_movingCameraY", "_stabilizeWhenMoving"];
-_gimbalData params ["_hasGimbal", "_maxGimbalX", "_maxGimbalY", "_gimbalSpeedX", "_gimbalSpeedY", "", "", "_gimbalZoomSpeedModifiers"];
+_cameraArray params ["_hasCamera", "", "", "", "", "", "", "", "_viewData", "_gimbalData", "", "_designating", "_canStopDesignating"];
+_viewData params ["_lookDir", "_groundPos", "_pointPos", "_movingCameraX", "_movingCameraY"];
+_gimbalData params ["_hasGimbal", "_maxGimbalX", "_maxGimbalY", "_gimbalSpeedX", "_gimbalSpeedY", "", "", "_gimbalZoomSpeedModifiers", "_stabilizeWhenMoving", "_designateWhenStationary", "_trackLockedPosition"];
 
 private _cameraNamespace = [_projectile] call FUNC(camera_getCameraNamespaceFromProjectile);
-if (_cameraNamespace isEqualTo objNull) exitWith {};
+if (!_hasCamera || { _cameraNamespace isEqualTo objNull }) exitWith {};
 
 if ([_cameraNamespace] call FUNC(camera_userInCamera)) then {
     cameraEffectEnableHUD true;
@@ -37,6 +37,9 @@ private _missileRelativeOffset = [0, (_cameraNamespace getVariable [QGVAR(projec
 private _cameraPosASL = (_projectile modelToWorldVisualWorld _missileRelativeOffset);
 
 private _designatedLastFrame = _cameraNamespace getVariable [QGVAR(designatedLastFrame), false];
+if (_designatedLastFrame && !_canStopDesignating && { !(_groundPos isEqualTo [0, 0, 0] && _pointPos isEqualTo [0, 0, 0]) }) then {
+    _designating = true;
+};
 
 if (!_designating && _designatedLastFrame) then {
     _designatedLastFrame = false;
@@ -78,11 +81,11 @@ if (_hasGimbal) then {
 
     private _lookInput = _cameraNamespace getVariable [QGVAR(lookInput), [0, 0, 0, 0]];
     _lookInput params ["_up", "_down", "_left", "_right"];
-       
-   _movingCameraX = (_right - _left) != 0;
-   _movingCameraY = (_up - _down) != 0;
-       
-    if ((_lookInput find 1) < 0) then {
+
+    _movingCameraX = (_right - _left) != 0;
+    _movingCameraY = (_up - _down) != 0;
+
+    if !(_movingCameraX || _movingCameraY) then {
         private _lastGroundPos = _cameraNamespace getVariable [QGVAR(lastMovedGroundPos), [0, 0, 0]];
         
         // If we designate a target set the current tracking point to the current ground point to avoid unwanted behavior from static cameras
@@ -91,6 +94,10 @@ if (_hasGimbal) then {
             _cameraNamespace setVariable [QGVAR(designatedLastFrame), _designatedLastFrame];
             _lastGroundPos = _groundPos;
             _cameraNamespace setVariable [QGVAR(lastMovedGroundPos), _lastGroundPos];
+        };
+
+        if (_trackLockedPosition && { !(_seekerTargetPos isEqualTo [0, 0, 0]) } && _canStopDesignating) then {
+            _lastGroundPos = _seekerTargetPos;
         };
 
         // lock the camera and dont gimbal with missile rotation
@@ -123,7 +130,7 @@ if (_hasGimbal) then {
                 _relativePos set [2, _expectedPos#2];
             };
         };
-    } else {
+    } else {   
         private _speedModifier = 1;
         if !(_gimbalZoomSpeedModifiers isEqualTo []) then {
             _speedModifier = (_gimbalZoomSpeedModifiers select (_cameraNamespace getVariable [QGVAR(currentZoomIndex), 0]));
@@ -131,9 +138,8 @@ if (_hasGimbal) then {
 
         private _posX = (_speedModifier * _gimbalSpeedX * _deltaTime * (_right - _left));
         private _posY = (_speedModifier * _gimbalSpeedY * _deltaTime * (_up - _down));
-               
+
         // carbon copy of the ground stabilization code. DRY and all that but this is a special case
-        _stabilizeWhenMoving = true;
         if (_stabilizeWhenMoving) then {
             private _relativePosOffset = _relativePos vectorDiff _missileRelativeOffset;
 
@@ -176,11 +182,10 @@ if (_hasGimbal) then {
     };
 };
 
-_designating = _cameraNamespace getVariable [QGVAR(alwaysDesignate), false] || { (_cameraNamespace getVariable [QGVAR(designateInput), [0]])#0 == 1 };
+_designating = (!_canStopDesignating && _designating) || { _cameraNamespace getVariable [QGVAR(alwaysDesignate), false] || { (_cameraNamespace getVariable [QGVAR(designateInput), [0]])#0 == 1 } };
 if (_designateWhenStationary && !(_movingCameraX || _movingCameraY)) then {
     _designating = true;
 };
-_cameraArray set [10, _designating];
 _cameraNamespace setVariable [QGVAR(logicPos), _relativePos];
 
 _logic setVectorUp [0, 0, 1];
@@ -213,6 +218,8 @@ if (_movingCameraX || _movingCameraY) then {
     _cameraNamespace setVariable [QGVAR(lastMovedGroundPos), _groundPos];
 };
 
+_cameraArray set [11, _designating];
+
 drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 0.5, 1, 1], _projectile modelToWorldVisual _missileRelativeOffset, 0.75, 0.75, 0, "Camera Pos", 1, 0.025, "TahomaB"];
 drawIcon3D ["\a3\ui_f\data\IGUI\Cfg\Cursors\selectover_ca.paa", [1, 0.5, 1, 1], getPosATL _logic, 0.75, 0.75, 0, "Logic Pos", 1, 0.025, "TahomaB"];
 
@@ -228,5 +235,7 @@ _cameraArray set [8, _viewData];
 _extractedInfo set [12, _cameraArray];
 
 _camera camCommit 0;
- 
+
+[_cameraNamespace, _extractedInfo, _seekerTargetPos] call FUNC(camera_updateTargetingGate);
+
  

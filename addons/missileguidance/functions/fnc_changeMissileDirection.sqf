@@ -16,10 +16,10 @@
  * Public: No
  */
 
-params ["_projectile", "_v"];
+params ["_projectile", "_v", "_deltaTime"];
 
 private _l = sqrt ((_v select 0) ^ 2 + (_v select 1) ^ 2);
 private _r = -(_v select 2) / _l;
 
 _projectile setVectorDirAndUp [ _v, [(_v select 0) * _r,(_v select 1) * _r, _l] ];
-_projectile setVelocity (_v vectorMultiply (vectorMagnitude (velocity _projectile)));
+_projectile setVelocity vectorLinearConversion [0, 1, _deltaTime, velocity _projectile, (_v vectorMultiply (vectorMagnitude (velocity _projectile))), true];

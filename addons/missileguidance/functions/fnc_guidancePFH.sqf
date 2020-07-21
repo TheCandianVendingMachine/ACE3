@@ -95,7 +95,7 @@ if ((_minDeflection != 0 || {_maxDeflection != 0}) && {!(_profileAdjustedTargetP
     if (accTime > 0) then {
         private _changeVector = (vectorDir _projectile) vectorAdd _finalAdjustVector;
         TRACE_2("",_projectile,_changeVector);
-        [_projectile, _changeVector] call FUNC(changeMissileDirection);
+        [_projectile, _changeVector, _runtimeDelta] call FUNC(changeMissileDirection);
     };
 };
 

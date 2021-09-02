@@ -21,3 +21,11 @@ GVAR(canAttach) = false;
     _child setTowParent _parent;
 }] call CBA_fnc_addEventHandler;
 
+if (!isServer) exitWith {};
+
+["Tank", "initPost", {(_this select 0) addItemCargoGlobal ["ACE_rope12", 1]}, true, [], true] call CBA_fnc_addClassEventHandler;
+["Car", "initPost", {
+    params ["_car"];
+    private _rope = ["ACE_rope6", "ACE_rope12"] select (_car isKindOf "Truck_F" || {_car isKindOf "Wheeled_APC_F"});
+    _car addItemCargoGlobal [_rope, 1]
+}, true, [], true] call CBA_fnc_addClassEventHandler;

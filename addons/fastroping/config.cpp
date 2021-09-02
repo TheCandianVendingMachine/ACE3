@@ -4,7 +4,7 @@ class CfgPatches {
     class ADDON {
         name = COMPONENT_NAME;
         units[] = {"ACE_fastropingSupplyCrate"};
-        weapons[] = {"ACE_rope12","ACE_rope15","ACE_rope18","ACE_rope27","ACE_rope36"};
+        weapons[] = {};
         requiredVersion = REQUIRED_VERSION;
         requiredAddons[] = {"ace_interaction"};
         author = ECSTRING(common,ACETeam);
@@ -19,4 +19,3 @@ class CfgPatches {
 #include "CfgSounds.hpp"
 #include "CfgVehicles.hpp"
 #include "CfgWaypoints.hpp"
-

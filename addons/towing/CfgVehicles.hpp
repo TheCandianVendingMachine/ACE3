@@ -5,10 +5,7 @@ class ACE_Actions {\
             displayName = CSTRING(displayName);\
             distance = TOW_ACTION_DISTANCE;\
             condition = QUOTE([ARR_1(_target)] call FUNC(isSuitableSimulation));\
-            statement = "";\
             exceptions[] = { INTERACTION_EXCEPTIONS };\
-            showDisabled = 0;\
-            icon = "";\
             class GVAR(startTow3) {\
                 displayName = CSTRING(start3);\
                 condition = QUOTE(([ARR_2(_player,_target)] call FUNC(canStartTow)) && [ARR_2(_player, 'ACE_rope3')] call EFUNC(common,hasItem));\
@@ -76,7 +73,6 @@ class CfgVehicles {
         class ACE_Actions {
             class ACE_MainActions {
                 displayName = CSTRING(detach);
-                condition = "true";
                 statement = QUOTE(private _parent = _target getVariable [ARR_2(QQGVAR(parent), objNull)]; private _child = _target getVariable [ARR_2(QQGVAR(child), objNull)]; [ARR_3(_player,_parent,_child)] call FUNC(detach));
                 distance = 2;
             };
